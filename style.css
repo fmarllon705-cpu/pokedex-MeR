@@ -1,5 +1,5 @@
 /* ==========================================
-   POKÉDEX RETRO-MODERNA + SIMULADOR 3x3
+   POKÉDEX RETRO-MODERNA - ALTO CONTRASTE
    ========================================== */
 
 :root {
@@ -51,21 +51,21 @@ body.pokedex-body {
 
 /* CARDS INTERNOS */
 .pokedex-inner-card {
-  background: rgba(0, 0, 0, 0.25);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
 }
 
 /* TELAS ESTILO GAMEBOY */
 .screen-box {
   background: #151515;
-  border: 2px solid #333;
+  border: 2px solid #444;
   border-radius: 10px;
 }
 
 .screen-label {
-  color: #aaa;
-  font-size: 0.75rem;
+  color: #ddd !important;
+  font-size: 0.8rem;
   font-weight: bold;
 }
 
@@ -78,34 +78,64 @@ body.pokedex-body {
 }
 
 /* ==========================================
+   CORREÇÃO DE LEGIBILIDADE E PLACEHOLDERS (TEXTOS EM CINZA)
+   ========================================== */
+
+/* Força os campos de texto a ficarem bem legíveis */
+.pokedex-input {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #666 !important;
+  font-weight: 500;
+}
+
+.pokedex-input:focus {
+  border-color: #ffde00 !important;
+  box-shadow: 0 0 8px rgba(255, 222, 0, 0.8);
+}
+
+/* CORRIGE O TEXTO DE EXEMPLO (PLACEHOLDER) PARA BRANCO/AMARELO CLARO */
+.pokedex-input::placeholder {
+  color: #d1d5db !important;
+  opacity: 1 !important; /* Garante que navegadores não escureçam */
+  font-style: italic;
+}
+
+/* Força legibilidade em selects/dropdowns */
+select.pokedex-input option {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================
    SIMULADOR DA FOLHA DO FICHÁRIO 3x3
    ========================================== */
 
 .binder-preview-container {
-  background: #1e242b;
-  border: 2px solid #343a40;
+  background: #11161b;
+  border: 2px solid #495057;
   color: #fff;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
 .binder-header-info {
-  background: #12161a;
+  background: #000000;
   border-radius: 8px;
-  border: 1px solid #2c3238;
+  border: 1px solid #555;
 }
 
 .sheet-badge-num {
-  color: #ffc107;
+  color: #ffde00 !important;
   font-size: 0.85rem;
 }
 
 .sheet-badge-side {
-  color: #0dcaf0;
+  color: #00e5ff !important;
   font-size: 0.85rem;
 }
 
 .sheet-badge-pocket {
-  color: #20c997;
+  color: #00ff87 !important;
   font-size: 0.85rem;
 }
 
@@ -119,48 +149,37 @@ body.pokedex-body {
 
 .pocket-slot {
   aspect-ratio: 2.5 / 3.5;
-  background: #2b3036;
-  border: 2px dashed #495057;
+  background: #212529;
+  border: 2px dashed #6c757d;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 0.9rem;
-  color: #6c757d;
+  font-size: 0.95rem;
+  color: #f8f9fa !important; /* Números dos bolsos bem claros */
   transition: all 0.3s ease;
 }
 
-/* ESTADO ATIVO DO BOLSO (HIGHLIGHT VERDE BRILHANTE) */
+/* HIGHLIGHT DO BOLSO SELECIONADO */
 .pocket-slot.active {
   background: #00ff87 !important;
-  color: #000 !important;
+  color: #000000 !important;
   border: 2px solid #ffffff !important;
-  box-shadow: 0 0 12px #00ff87, inset 0 0 6px #ffffff;
-  transform: scale(1.05);
-  font-size: 1.1rem;
+  box-shadow: 0 0 14px #00ff87, inset 0 0 6px #ffffff;
+  transform: scale(1.06);
+  font-size: 1.2rem;
 }
 
-/* INPUTS E BOTÕES POKÉDEX */
-.pokedex-input {
-  background: #1e1e1e !important;
-  color: #fff !important;
-  border: 1px solid #444 !important;
-}
-
-.pokedex-input:focus {
-  border-color: #ffde00 !important;
-  box-shadow: 0 0 5px rgba(255, 222, 0, 0.5);
-}
-
+/* BOTÕES POKÉDEX */
 .btn-pokedex-tool {
-  background: #333;
+  background: #222;
   color: #fff;
-  border: 1px solid #555;
+  border: 1px solid #666;
 }
 
 .btn-pokedex-tool:hover {
-  background: #555;
+  background: #444;
   color: #fff;
 }
 
