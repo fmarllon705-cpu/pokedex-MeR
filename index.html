@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pokédex do Casal</title>
+  <title>Pokédex</title>
 
   <!-- PWA Manifest & Tema -->
   <link rel="manifest" href="manifest.json">
@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- Ícones -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23dc0a2d'/><stop offset='100%' stop-color='%238e0018'/></linearGradient><linearGradient id='pr' x1='0%' y1='0%' x2='0%' y2='100%'><stop offset='0%' stop-color='%23ff1c1c'/><stop offset='100%' stop-color='%23990000'/></linearGradient></defs><rect width='512' height='512' rx='110' fill='url(%23bg)'/><rect x='96' y='80' width='320' height='352' rx='24' fill='%23ffde00' stroke='%23000' stroke-width='12'/><circle cx='96' cy='140' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><circle cx='96' cy='256' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><circle cx='96' cy='372' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><path d='M 166 256 A 90 90 0 0 1 346 256 Z' fill='url(%23pr)' stroke='%23000' stroke-width='12'/><path d='M 166 256 A 90 90 0 0 0 346 256 Z' fill='%23fff' stroke='%23000' stroke-width='12'/><line x1='166' y1='256' x2='346' y2='256' stroke='%23000' stroke-width='12'/><circle cx='256' cy='256' r='28' fill='%23fff' stroke='%23000' stroke-width='10'/><path d='M 256 264 C 256 264 244 256 244 250 C 244 246 248 243 252 244 C 254 245 256 247 256 247 C 256 247 258 245 260 244 C 264 243 268 246 268 250 C 268 256 256 264 256 264 Z' fill='%23dc0a2d'/></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23dc0a2d'/><stop offset='100%' stop-color='%238e0018'/></linearGradient><linearGradient id='pr' x1='0%' y1='0%' x2='0%' y2='100%'><stop offset='0%' stop-color='%23ff1c1c'/><stop offset='100%' stop-color='%23990000'/></linearGradient></defs><rect width='512' height='512' rx='110' fill='url(%23bg)'/><rect x='96' y='80' width='320' height='352' rx='24' fill='%23ffde00' stroke='%23000' stroke-width='12'/><circle cx='96' cy='140' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><circle cx='96' cy='256' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><circle cx='96' cy='372' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><path d='M 166 256 A 90 90 0 0 1 346 256 Z' fill='url(%23pr)' stroke='%23000' stroke-width='12'/><path d='M 166 256 A 90 90 0 0 0 346 256 Z' fill='%23fff' stroke='%23000' stroke-width='12'/><line x1='166' y1='256' x2='346' y2='256' stroke='%23000' stroke-width='12'/><circle cx='256' cy='256' r='28' fill='%23fff' stroke='%23000' stroke-width='10'/><path d='M 256 264 C 256 264 244 256 244 250 C 244 246 248 243 252 244 C 254 245 256 247 256 247 C 264 243 268 246 268 250 C 268 256 256 264 256 264 Z' fill='%23dc0a2d'/></svg>">
   <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23dc0a2d'/><stop offset='100%' stop-color='%238e0018'/></linearGradient><linearGradient id='pr' x1='0%' y1='0%' x2='0%' y2='100%'><stop offset='0%' stop-color='%23ff1c1c'/><stop offset='100%' stop-color='%23990000'/></linearGradient></defs><rect width='512' height='512' rx='110' fill='url(%23bg)'/><rect x='96' y='80' width='320' height='352' rx='24' fill='%23ffde00' stroke='%23000' stroke-width='12'/><circle cx='96' cy='140' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><circle cx='96' cy='256' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><circle cx='96' cy='372' r='14' fill='%23444' stroke='%23000' stroke-width='6'/><path d='M 166 256 A 90 90 0 0 1 346 256 Z' fill='url(%23pr)' stroke='%23000' stroke-width='12'/><path d='M 166 256 A 90 90 0 0 0 346 256 Z' fill='%23fff' stroke='%23000' stroke-width='12'/><line x1='166' y1='256' x2='346' y2='256' stroke='%23000' stroke-width='12'/><circle cx='256' cy='256' r='28' fill='%23fff' stroke='%23000' stroke-width='10'/><path d='M 256 264 C 256 264 244 256 244 250 C 244 246 248 243 252 244 C 254 245 256 247 256 247 C 264 243 268 246 268 250 C 268 256 256 264 256 264 Z' fill='%23dc0a2d'/></svg>">
 
   <!-- Bootstrap CSS & Icons -->
@@ -34,7 +34,7 @@
 
   <div class="container pb-5">
 
-    <!-- PAINEL DE ESTATÍSTICAS E VALOR TOTAL (NOVO) -->
+    <!-- ESTATÍSTICAS E VALOR TOTAL -->
     <div class="row g-3 mb-4">
       <div class="col-md-8">
         <div class="card shadow-sm border-0 h-100">
@@ -93,7 +93,6 @@
               
               <!-- DETALHES DE COLECIONADOR -->
               <div id="collector-details" class="row g-2 mb-3 text-start" style="display: none;">
-                <!-- IDIOMA E CONDICAO -->
                 <div class="col-6">
                   <label class="form-label small fw-bold mb-1">Idioma</label>
                   <select id="card-lang" class="form-select form-select-sm">
@@ -111,7 +110,17 @@
                   </select>
                 </div>
 
-                <!-- NUMERAÇÃO E PREÇO (NOVOS CAMPOS) -->
+                <!-- ACABAMENTO/RARIDADE (NOVO) -->
+                <div class="col-12">
+                  <label class="form-label small fw-bold mb-1">Acabamento / Estilo</label>
+                  <select id="card-finish" class="form-select form-select-sm">
+                    <option value="Normal">Normal (Regular)</option>
+                    <option value="Holo">Holo ✨ (Brilhante)</option>
+                    <option value="Reverse">Reverse Holo 🌟</option>
+                    <option value="Ultra">Ultra Rara / Secret 💎</option>
+                  </select>
+                </div>
+
                 <div class="col-6">
                   <label class="form-label small fw-bold mb-1">Nº Carta (Set)</label>
                   <input type="text" id="card-number" class="form-control form-select-sm" placeholder="ex: 005/094">
@@ -142,7 +151,7 @@
         </div>
       </div>
 
-      <!-- LISTA DE CARDS COM FILTROS -->
+      <!-- LISTA DE CARDS COM FILTROS E BUSCA INTERNA -->
       <div class="col-md-7">
         <div class="card shadow-sm border-0">
           <div class="card-body">
@@ -152,19 +161,32 @@
               </h5>
             </div>
 
-            <!-- BARRA DE FILTROS DA COLEÇÃO -->
+            <!-- BARRA DE FILTROS E BUSCA INTERNA (ATUALIZADA) -->
             <div class="row g-2 mb-3">
-              <div class="col-7">
+              <div class="col-12">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text" id="search-saved" class="form-control" placeholder="Buscar no fichário por nome...">
+                </div>
+              </div>
+              <div class="col-5">
                 <select id="filter-section" class="form-select form-select-sm">
-                  <option value="all">Todas as Seções</option>
+                  <option value="all">Todas Seções</option>
                   <option value="main">National Dex</option>
-                  <option value="fullart">Full Art / Secretas</option>
+                  <option value="fullart">Full Art</option>
                   <option value="valuable">Valiosas</option>
                   <option value="cute">Fofos</option>
                 </select>
               </div>
-              <div class="col-5">
-                <input type="number" id="filter-sheet" class="form-control form-select-sm" placeholder="Nº Folha..." min="1" max="100">
+              <div class="col-3">
+                <input type="number" id="filter-sheet" class="form-control form-select-sm" placeholder="Folha..." min="1">
+              </div>
+              <div class="col-4">
+                <select id="sort-order" class="form-select form-select-sm">
+                  <option value="sheet">Ord: Folha</option>
+                  <option value="price-desc">R$ Maior ➔ Menor</option>
+                  <option value="recent">Mais Recentes</option>
+                </select>
               </div>
             </div>
 
