@@ -59,6 +59,7 @@ const cardCondition = document.getElementById('card-condition');
 const cardFinish = document.getElementById('card-finish');
 const cardPrice = document.getElementById('card-price');
 const cardShiny = document.getElementById('card-shiny');
+const cardQuantity = document.getElementById('card-quantity'); // Input de quantidade principal
 
 const collectionGrid = document.getElementById('collection-grid');
 const collectionCount = document.getElementById('collection-count');
@@ -230,6 +231,7 @@ function selectTcgCard(index) {
   cardShiny.checked = false;
   cardPrice.value = calculatedPrice;
   cardFinish.value = "Normal";
+  if (cardQuantity) cardQuantity.value = 1;
 
   collectorDetails.style.display = "flex";
   btnSave.style.display = "block";
@@ -251,7 +253,6 @@ function calculatePhysicalPosition(nationalId) {
   const safeId = (!nationalId || nationalId > 1025) ? 1026 : nationalId;
   const globalIndex = Math.max(0, safeId - 1);
 
-  // Cada folha possui 18 bolsos (9 na frente, 9 no verso)
   const actualSheet = Math.min(100, Math.floor(globalIndex / 18) + 1);
   const positionInSheet = globalIndex % 18;
   const isFront = positionInSheet < 9;
@@ -320,6 +321,7 @@ btnSave.addEventListener('click', () => {
   currentPokemon.condition = cardCondition.value;
   currentPokemon.finish = cardFinish.value;
   currentPokemon.price = parseFloat(cardPrice.value) || 0;
+  currentPokemon.quantity = parseInt(cardQuantity?.value || 1, 10);
   currentPokemon.isShiny = cardShiny.checked;
 
   const newCardRef = collectionRef.push();
@@ -352,7 +354,12 @@ function renderCollection() {
   collectionCount.textContent = items.length;
   updateProgressBar(items.length);
 
-  const totalValue = items.reduce((acc, [_, item]) => acc + (parseFloat(item.price) || 0), 0);
+  const totalValue = items.reduce((acc, [_, item]) => {
+    const itemQty = parseInt(item.quantity || 1, 10);
+    const itemPrice = parseFloat(item.price) || 0;
+    return acc + (itemPrice * itemQty);
+  }, 0);
+  
   totalValueDisplay.textContent = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const selectedSection = filterSection.value;
@@ -373,17 +380,14 @@ function renderCollection() {
     } else if (currentSort === 'recent') {
       return new Date(itemB.addedAt || 0) - new Date(itemA.addedAt || 0);
     } else {
-      // 1. Ordena primariamente por Folha
       const sheetA = itemA.location?.sheet || 0;
       const sheetB = itemB.location?.sheet || 0;
       if (sheetA !== sheetB) return sheetA - sheetB;
 
-      // 2. Ordena por Lado (Frente antes de Verso)
       const sideA = itemA.location?.side === 'Frente' ? 0 : 1;
       const sideB = itemB.location?.side === 'Frente' ? 0 : 1;
       if (sideA !== sideB) return sideA - sideB;
 
-      // 3. Ordena por Bolso (1 ao 9)
       const pocketA = itemA.location?.pocket || 0;
       const pocketB = itemB.location?.pocket || 0;
       return pocketA - pocketB;
@@ -401,6 +405,7 @@ function renderCollection() {
     });
 
     const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1" style="font-size: 0.55rem;">✨</span>' : '';
+    const qtyBadge = (item.quantity && item.quantity > 1) ? `<span class="badge bg-success position-absolute top-0 start-50 translate-middle-x mt-1" style="font-size: 0.55rem;">${item.quantity}x</span>` : '';
     const langBadge = item.lang ? `<span class="badge bg-secondary me-1" style="font-size: 0.55rem;">${item.lang}</span>` : '';
     const condBadge = item.condition ? `<span class="badge bg-dark" style="font-size: 0.55rem;">${item.condition}</span>` : '';
     
@@ -414,6 +419,7 @@ function renderCollection() {
 
     card.innerHTML = `
       ${shinyBadge}
+      ${qtyBadge}
       <button class="btn btn-sm text-danger position-absolute top-0 end-0 p-0 me-1 mt-1" onclick="removePokemon('${key}')" style="font-size: 0.8rem;" title="Remover">
         <i class="fa-solid fa-circle-xmark"></i>
       </button>
@@ -449,6 +455,7 @@ const modalCardLang = document.getElementById('modalCardLang');
 const modalCardCondition = document.getElementById('modalCardCondition');
 const modalCardFinish = document.getElementById('modalCardFinish');
 const modalCardPrice = document.getElementById('modalCardPrice');
+const modalCardQuantity = document.getElementById('modalCardQuantity');
 const modalCardLocation = document.getElementById('modalCardLocation');
 
 const modalViewMode = document.getElementById('modalViewMode');
@@ -461,6 +468,7 @@ const modalEditLang = document.getElementById('modalEditLang');
 const modalEditCondition = document.getElementById('modalEditCondition');
 const modalEditFinish = document.getElementById('modalEditFinish');
 const modalEditPrice = document.getElementById('modalEditPrice');
+const modalEditQuantity = document.getElementById('modalEditQuantity');
 
 const modalBtnEditToggle = document.getElementById('modalBtnEditToggle');
 const modalBtnSave = document.getElementById('modalBtnSave');
@@ -487,6 +495,7 @@ function openCardModal(key, item) {
   modalCardCondition.textContent = item.condition || '---';
   modalCardFinish.textContent = item.finish || 'Normal';
   modalCardPrice.textContent = `R$ ${parseFloat(item.price || 0).toFixed(2)}`;
+  if (modalCardQuantity) modalCardQuantity.textContent = `${item.quantity || 1}x`;
   modalCardLocation.textContent = `Folha ${item.location?.sheet || '--'} (${item.location?.side || '---'} / Bolso ${item.location?.pocket || '-'})`;
 
   modalEditSection.value = item.section || 'kanto';
@@ -494,6 +503,7 @@ function openCardModal(key, item) {
   modalEditCondition.value = item.condition || 'NM';
   modalEditFinish.value = item.finish || 'Normal';
   modalEditPrice.value = item.price || 0;
+  if (modalEditQuantity) modalEditQuantity.value = item.quantity || 1;
   modalEditShiny.checked = item.isShiny || false;
 
   modalBtnRemove.onclick = () => {
@@ -532,6 +542,7 @@ modalBtnSave.addEventListener('click', () => {
     condition: modalEditCondition.value,
     finish: modalEditFinish.value,
     price: parseFloat(modalEditPrice.value) || 0,
+    quantity: parseInt(modalEditQuantity?.value || 1, 10),
     isShiny: modalEditShiny.checked
   };
 
@@ -590,34 +601,4 @@ btnBackup.addEventListener('click', () => {
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
-});
-
-// Script rápido para recalcular e atualizar o Firebase com as posições certas baseadas no ID Nacional
-collectionRef.once('value', (snapshot) => {
-  const data = snapshot.val();
-  if (!data) return console.log("Nenhum dado encontrado.");
-
-  const updates = {};
-  
-  Object.entries(data).forEach(([key, item]) => {
-    const safeId = (!item.id || item.id > 1025) ? 1026 : item.id;
-    const globalIndex = Math.max(0, safeId - 1);
-
-    const actualSheet = Math.min(100, Math.floor(globalIndex / 18) + 1);
-    const positionInSheet = globalIndex % 18;
-    const isFront = positionInSheet < 9;
-    const sideText = isFront ? "Frente" : "Verso";
-    const pocketNumber = (positionInSheet % 9) + 1;
-
-    // Atualiza apenas a propriedade location de cada item
-    updates[`${key}/location`] = {
-      sheet: actualSheet,
-      side: sideText,
-      pocket: pocketNumber
-    };
-  });
-
-  collectionRef.update(updates)
-    .then(() => console.log("✨ Todas as localizações foram corrigidas com sucesso no Firebase!"))
-    .catch((err) => console.error("Erro ao atualizar:", err));
 });
