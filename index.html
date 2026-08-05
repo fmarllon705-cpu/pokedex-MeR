@@ -64,21 +64,27 @@
             <h5 class="fw-bold mb-3 text-warning"><i class="fa-solid fa-circle-plus"></i> Capturar Carta</h5>
             
             <div class="mb-2">
-              <label class="form-label small text-light fw-bold mb-1">Seção do Fichário</label>
+              <label class="form-label small text-light fw-bold mb-1">Região do Fichário</label>
               <select id="section-select" class="form-select pokedex-input">
-                <option value="main">National Dex (Folha 1+)</option>
-                <option value="fullart">Full Arts / Secretas (Folha 61+)</option>
-                <option value="valuable">Valiosas / Raras (Folha 76+)</option>
-                <option value="cute">Fofos / Especiais (Folha 89+)</option>
+                <option value="kanto">1ª Geração - Kanto (#001-#151)</option>
+                <option value="johto">2ª Geração - Johto (#152-#251)</option>
+                <option value="hoenn">3ª Geração - Hoenn (#252-#386)</option>
+                <option value="sinnoh">4ª Geração - Sinnoh (#387-#493)</option>
+                <option value="unova">5ª Geração - Unova (#494-#649)</option>
+                <option value="kalos">6ª Geração - Kalos (#650-#721)</option>
+                <option value="alola">7ª Geração - Alola (#722-#809)</option>
+                <option value="galar">8ª Geração - Galar (#810-#905)</option>
+                <option value="paldea">9ª Geração - Paldea (#906-#1025)</option>
+                <option value="especiais">Cartas Especiais / Promos</option>
               </select>
             </div>
 
             <div class="row g-2 mb-3">
               <div class="col-7">
-                <input type="text" id="pokemon-input" class="form-control pokedex-input" placeholder="Nome (ex: Drifloon)">
+                <input type="text" id="pokemon-input" class="form-control pokedex-input" placeholder="Nome (ex: Morgrem)">
               </div>
               <div class="col-5">
-                <input type="text" id="card-number-input" class="form-control pokedex-input" placeholder="Nº (ex: 5 ou 005)">
+                <input type="text" id="card-number-input" class="form-control pokedex-input" placeholder="Nº (ex: 95 ou 095)">
               </div>
             </div>
 
@@ -183,11 +189,17 @@
             <div class="row g-2 mb-3">
               <div class="col-md-4">
                 <select id="filter-section" class="form-select form-select-sm pokedex-input">
-                  <option value="all">Todas Seções</option>
-                  <option value="main">National Dex</option>
-                  <option value="fullart">Full Arts / Secretas</option>
-                  <option value="valuable">Valiosas / Raras</option>
-                  <option value="cute">Fofos / Especiais</option>
+                  <option value="all">Todas as Regiões</option>
+                  <option value="kanto">Kanto</option>
+                  <option value="johto">Johto</option>
+                  <option value="hoenn">Hoenn</option>
+                  <option value="sinnoh">Sinnoh</option>
+                  <option value="unova">Unova</option>
+                  <option value="kalos">Kalos</option>
+                  <option value="alola">Alola</option>
+                  <option value="galar">Galar</option>
+                  <option value="paldea">Paldea</option>
+                  <option value="especiais">Especiais / Promos</option>
                 </select>
               </div>
               <div class="col-md-3">
@@ -266,12 +278,18 @@
               <!-- MODO EDIÇÃO (Oculto inicialmente) -->
               <div id="modalEditMode" class="d-none">
                 <div class="mb-1">
-                  <label class="small fw-bold text-muted mb-0">Seção</label>
+                  <label class="small fw-bold text-muted mb-0">Região</label>
                   <select id="modalEditSection" class="form-select form-select-sm">
-                    <option value="main">National Dex</option>
-                    <option value="fullart">Full Arts / Secretas</option>
-                    <option value="valuable">Valiosas / Raras</option>
-                    <option value="cute">Fofos / Especiais</option>
+                    <option value="kanto">Kanto</option>
+                    <option value="johto">Johto</option>
+                    <option value="hoenn">Hoenn</option>
+                    <option value="sinnoh">Sinnoh</option>
+                    <option value="unova">Unova</option>
+                    <option value="kalos">Kalos</option>
+                    <option value="alola">Alola</option>
+                    <option value="galar">Galar</option>
+                    <option value="paldea">Paldea</option>
+                    <option value="especiais">Especiais / Promos</option>
                   </select>
                 </div>
                 <div class="mb-1">
