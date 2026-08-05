@@ -23,6 +23,11 @@ const resSheet = document.getElementById('res-sheet');
 const resSide = document.getElementById('res-side');
 const resPocket = document.getElementById('res-pocket');
 
+const collectorDetails = document.getElementById('collector-details');
+const cardLang = document.getElementById('card-lang');
+const cardCondition = document.getElementById('card-condition');
+const cardShiny = document.getElementById('card-shiny');
+
 const collectionGrid = document.getElementById('collection-grid');
 const collectionCount = document.getElementById('collection-count');
 const progressBar = document.getElementById('progress-bar');
@@ -33,6 +38,7 @@ const filterSheet = document.getElementById('filter-sheet');
 
 let currentPokemon = null;
 let currentRawData = null;
+let rawPokemonSprites = {}; // Guarda sprites normal e shiny
 
 // 1. BUSCAR POKÉMON NA POKÉAPI
 async function searchPokemon() {
@@ -42,6 +48,7 @@ async function searchPokemon() {
   pokeName.textContent = "Buscando...";
   pokeImg.style.display = "none";
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "block";
+  collectorDetails.style.display = "none";
 
   try {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${query}`);
@@ -49,10 +56,17 @@ async function searchPokemon() {
 
     const data = await response.json();
 
+    rawPokemonSprites = {
+      default: data.sprites.front_default || data.sprites.other['official-artwork'].front_default,
+      shiny: data.sprites.front_shiny || data.sprites.other['official-artwork'].front_shiny || data.sprites.front_default
+    };
+
+    cardShiny.checked = false; // Reset switch shiny
+
     currentPokemon = {
       id: data.id,
       name: data.name,
-      image: data.sprites.front_default || data.sprites.other['official-artwork'].front_default,
+      image: rawPokemonSprites.default,
       section: sectionSelect.value,
       addedAt: new Date().toISOString()
     };
@@ -63,16 +77,26 @@ async function searchPokemon() {
     pokeImg.style.display = "inline-block";
     if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
     
+    collectorDetails.style.display = "flex";
     btnSave.style.display = "block";
+
     calculatePhysicalPosition(currentPokemon.id);
 
   } catch (error) {
     pokeName.textContent = "Não encontrado ❌";
     pokeIdDisplay.textContent = "#---";
     btnSave.style.display = "none";
+    collectorDetails.style.display = "none";
     resetLocationInfo();
   }
 }
+
+// Chavear sprite Shiny
+cardShiny.addEventListener('change', () => {
+  if (!currentPokemon) return;
+  currentPokemon.image = cardShiny.checked ? rawPokemonSprites.shiny : rawPokemonSprites.default;
+  pokeImg.src = currentPokemon.image;
+});
 
 // 2. CÁLCULO DA POSIÇÃO FÍSICA
 function calculatePhysicalPosition(positionNumber) {
@@ -121,6 +145,11 @@ const collectionRef = database.ref('pokedexCollection');
 btnSave.addEventListener('click', () => {
   if (!currentPokemon) return;
 
+  // Adiciona detalhes extras de colecionador
+  currentPokemon.lang = cardLang.value;
+  currentPokemon.condition = cardCondition.value;
+  currentPokemon.isShiny = cardShiny.checked;
+
   const newCardRef = collectionRef.push();
   newCardRef.set(currentPokemon, (error) => {
     if (error) {
@@ -131,7 +160,7 @@ btnSave.addEventListener('click', () => {
   });
 });
 
-// 5. ESCUTAR MUDANÇAS & RENDERIZAR COM FILTROS
+// 5. ESCUTAR MUDANÇAS & RENDERIZAR COM FILTROS E TAGS
 collectionRef.on('value', (snapshot) => {
   const data = snapshot.val();
   currentRawData = data;
@@ -162,13 +191,20 @@ function renderCollection() {
   filteredItems.forEach(([key, item]) => {
     const card = document.createElement('div');
     card.classList.add('p-2', 'border', 'rounded', 'bg-body-secondary', 'text-center', 'position-relative');
-    card.style.width = "105px";
+    card.style.width = "110px";
+    
+    const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1 fs-8">✨</span>' : '';
+    const langBadge = item.lang ? `<span class="badge bg-secondary me-1" style="font-size: 0.6rem;">${item.lang}</span>` : '';
+    const condBadge = item.condition ? `<span class="badge bg-dark" style="font-size: 0.6rem;">${item.condition}</span>` : '';
+
     card.innerHTML = `
+      ${shinyBadge}
       <button class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 p-0 me-1 mt-1" onclick="removePokemon('${key}')">
         <i class="bi bi-x-circle-fill"></i>
       </button>
       <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: contain;">
       <span class="d-block text-capitalize fw-bold text-truncate small mt-1">${item.name}</span>
+      <div class="mb-1">${langBadge}${condBadge}</div>
       <span class="badge bg-warning text-dark w-100" style="font-size: 0.65rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
     `;
     collectionGrid.appendChild(card);
