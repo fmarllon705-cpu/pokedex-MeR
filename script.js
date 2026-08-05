@@ -22,6 +22,10 @@ const pokePlaceholderIcon = document.getElementById('poke-placeholder-icon');
 const pokeName = document.getElementById('poke-name');
 const pokeIdDisplay = document.getElementById('poke-id-display');
 
+// Elementos de Seletor de Edição
+const setSelectorContainer = document.getElementById('set-selector-container');
+const cardSetSelect = document.getElementById('card-set-select');
+
 // Elementos 3x3
 const resSheetBadge = document.getElementById('res-sheet-badge');
 const resSideBadge = document.getElementById('res-side-badge');
@@ -49,9 +53,11 @@ const sortOrder = document.getElementById('sort-order');
 let currentPokemon = null;
 let currentRawData = null;
 let rawPokemonSprites = {};
-let foundCardsList = []; // Guarda as cartas encontradas no TCG
+let foundCardsList = []; 
+let currentNationalId = 0;
+let currentTypedNumber = '';
 
-// 1. BUSCA DE PRECISÃO NA POKÉMON TCG API
+// 1. BUSCA INTELIGENTE NA POKÉMON TCG API
 async function searchPokemon() {
   const queryName = pokemonInput.value.trim().toLowerCase();
   let queryNumber = cardNumberInput.value.trim();
@@ -62,44 +68,59 @@ async function searchPokemon() {
   pokeImg.style.display = "none";
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "block";
   collectorDetails.style.display = "none";
+  setSelectorContainer.style.display = "none";
+  cardSetSelect.innerHTML = "";
 
-  // Remove o total de cartas da barra se o usuário digitou (ex: "007/094" vira "7" ou "007")
+  // Extrai o número limpo caso o usuário digite com / (ex: "005/094" ou "5")
   const cleanNumber = queryNumber ? queryNumber.split('/')[0].replace(/^0+/, '') : '';
+  currentTypedNumber = queryNumber;
 
   try {
-    // 1. Busca dados do Pokémon na PokéAPI (para o ID da Pokédex Nacional)
+    // Busca dados do Pokémon na PokéAPI (para o ID da Pokédex Nacional)
     const pokeApiResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${queryName}`);
-    let nationalId = 0;
+    currentNationalId = 0;
     if (pokeApiResponse.ok) {
       const pokeData = await pokeApiResponse.json();
-      nationalId = pokeData.id;
+      currentNationalId = pokeData.id;
       rawPokemonSprites = {
         default: pokeData.sprites.front_default || pokeData.sprites.other['official-artwork'].front_default,
         shiny: pokeData.sprites.front_shiny || pokeData.sprites.other['official-artwork'].front_shiny || pokeData.sprites.front_default
       };
     }
 
-    // 2. Monta a busca inteligente na Pokémon TCG API
+    // Busca ampla por nome na TCG API
     let tcgQuery = `name:"${queryName}"`;
     if (cleanNumber) {
       tcgQuery += ` (number:"${cleanNumber}" OR number:"${queryNumber.split('/')[0]}")`;
     }
 
-    const tcgResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(tcgQuery)}&orderBy=-set.releaseDate`);
-    const tcgData = await tcgResponse.json();
-
+    let tcgResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(tcgQuery)}&orderBy=-set.releaseDate`);
+    let tcgData = await tcgResponse.json();
     foundCardsList = tcgData.data || [];
 
+    // Se não encontrou filtrando por número (ex: promoções especiais), busca todas as cartas desse nome
     if (foundCardsList.length === 0) {
-      // Caso não ache na TCG API, tenta buscar só por nome
-      const fallbackResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${queryName}"&pageSize=10`);
+      const fallbackResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${queryName}"&orderBy=-set.releaseDate&pageSize=30`);
       const fallbackData = await fallbackResponse.json();
       foundCardsList = fallbackData.data || [];
     }
 
     if (foundCardsList.length > 0) {
-      // Seleciona a primeira carta por padrão (mais recente)
-      selectTcgCard(0, nationalId, queryNumber);
+      // Popula o Dropdown com todas as coleções encontradas
+      cardSetSelect.innerHTML = "";
+      foundCardsList.forEach((card, idx) => {
+        const option = document.createElement('option');
+        option.value = idx;
+        option.textContent = `[${card.set.name}] Nº ${card.number}/${card.set.printedTotal || '???'}`;
+        cardSetSelect.appendChild(option);
+      });
+
+      if (foundCardsList.length > 1) {
+        setSelectorContainer.style.display = "block";
+      }
+
+      // Seleciona a primeira carta da lista por padrão
+      selectTcgCard(0);
     } else {
       throw new Error("Nenhuma carta encontrada.");
     }
@@ -110,12 +131,19 @@ async function searchPokemon() {
     pokeIdDisplay.textContent = "#---";
     btnSave.style.display = "none";
     collectorDetails.style.display = "none";
+    setSelectorContainer.style.display = "none";
     resetLocationInfo();
   }
 }
 
-// 2. APLECA OS DADOS DA CARTA SELECIONADA
-function selectTcgCard(index, nationalId, typedNumber) {
+// Evento ao trocar de edição no Dropdown
+cardSetSelect.addEventListener('change', (e) => {
+  const selectedIndex = parseInt(e.target.value, 10);
+  selectTcgCard(selectedIndex);
+});
+
+// 2. APLICA A CARTA SELECIONADA À TELA
+function selectTcgCard(index) {
   const card = foundCardsList[index];
   if (!card) return;
 
@@ -129,20 +157,20 @@ function selectTcgCard(index, nationalId, typedNumber) {
     }
   }
 
-  const finalNumber = typedNumber || `${card.number}/${card.set.printedTotal || '???'}`;
+  const cardNumFormatted = `${card.number}/${card.set.printedTotal || '???'}`;
 
   currentPokemon = {
-    id: nationalId || 0,
+    id: currentNationalId || 0,
     name: card.name,
-    cardNumber: finalNumber,
+    cardNumber: cardNumFormatted,
     image: card.images.large || card.images.small,
     setName: card.set.name,
     section: sectionSelect.value,
     addedAt: new Date().toISOString()
   };
 
-  pokeName.textContent = `${currentPokemon.name} (${card.set.name})`;
-  pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} (Carta Nº ${currentPokemon.cardNumber})`;
+  pokeName.textContent = card.name;
+  pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} (${card.set.name} - Nº ${card.number})`;
   pokeImg.src = currentPokemon.image;
   pokeImg.style.display = "inline-block";
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
