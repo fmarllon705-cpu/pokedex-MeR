@@ -57,10 +57,10 @@
         </div>
       </div>
 
-      <!-- CORPO PRINCIPAL (DIVIDIDO EM 2 ABAS/LADOS) -->
+      <!-- CORPO PRINCIPAL -->
       <div class="row g-3 px-3 pb-3">
         
-        <!-- LADO ESQUERDO: CONTROLES DE ADIÇÃO -->
+        <!-- LADO ESQUERDO: CONTROLES DE ADIÇÃO & SIMULADOR DE FOLHA 3x3 -->
         <div class="col-lg-5">
           <div class="pokedex-inner-card p-3">
             <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-plus-circle"></i> Capturar Pokémon</h5>
@@ -83,7 +83,7 @@
             <!-- TELA GREEN SCREEN POKÉDEX PREVIEW -->
             <div id="search-result" class="pokedex-screen text-center p-3 mb-2">
               <i id="poke-placeholder-icon" class="fa-solid fa-gamepad fs-1 text-muted py-3"></i>
-              <img id="poke-img" src="" alt="" style="display: none; max-width: 100px;">
+              <img id="poke-img" src="" alt="" style="display: none; max-width: 90px;">
               <h5 id="poke-name" class="fw-bold text-uppercase mb-0 text-dark">-</h5>
               <p id="poke-id-display" class="small mb-2 text-secondary">#---</p>
               
@@ -128,11 +128,28 @@
                 </div>
               </div>
 
-              <!-- POSIÇÃO CALCULADA -->
-              <div class="position-box p-1 rounded">
-                <small class="d-block fw-bold text-uppercase">Posição no Fichário:</small>
-                <span class="small fw-bold">Folha: <span id="res-sheet">-</span> | Lado: <span id="res-side">-</span> | Bolso: <span id="res-pocket">-</span></span>
+              <!-- VISUALIZADOR DA FOLHA FÍSICA (SIMULADOR 3x3 ESTILO APONTADO) -->
+              <div id="binder-visualizer" class="binder-preview-container p-2 rounded mb-2">
+                <div class="binder-header-info d-flex justify-content-between align-items-center px-2 py-1 mb-2">
+                  <span class="sheet-badge-num fw-bold" id="res-sheet-badge">Folha --</span>
+                  <span class="sheet-badge-side fw-bold text-uppercase" id="res-side-badge">---</span>
+                  <span class="sheet-badge-pocket fw-bold" id="res-pocket-badge">Bolso -</span>
+                </div>
+                
+                <!-- GRID FÍSICO 9 POCKETS (3x3) -->
+                <div class="binder-grid-3x3">
+                  <div class="pocket-slot" data-pocket="1">1</div>
+                  <div class="pocket-slot" data-pocket="2">2</div>
+                  <div class="pocket-slot" data-pocket="3">3</div>
+                  <div class="pocket-slot" data-pocket="4">4</div>
+                  <div class="pocket-slot" data-pocket="5">5</div>
+                  <div class="pocket-slot" data-pocket="6">6</div>
+                  <div class="pocket-slot" data-pocket="7">7</div>
+                  <div class="pocket-slot" data-pocket="8">8</div>
+                  <div class="pocket-slot" data-pocket="9">9</div>
+                </div>
               </div>
+
             </div>
 
             <button id="btn-save" class="btn btn-success w-100 fw-bold btn-pokedex-action" style="display: none;">
