@@ -373,7 +373,20 @@ function renderCollection() {
     } else if (currentSort === 'recent') {
       return new Date(itemB.addedAt || 0) - new Date(itemA.addedAt || 0);
     } else {
-      return (itemA.location?.sheet || 0) - (itemB.location?.sheet || 0);
+      // 1. Ordena primariamente por Folha
+      const sheetA = itemA.location?.sheet || 0;
+      const sheetB = itemB.location?.sheet || 0;
+      if (sheetA !== sheetB) return sheetA - sheetB;
+
+      // 2. Ordena por Lado (Frente antes de Verso)
+      const sideA = itemA.location?.side === 'Frente' ? 0 : 1;
+      const sideB = itemB.location?.side === 'Frente' ? 0 : 1;
+      if (sideA !== sideB) return sideA - sideB;
+
+      // 3. Ordena por Bolso (1 ao 9)
+      const pocketA = itemA.location?.pocket || 0;
+      const pocketB = itemB.location?.pocket || 0;
+      return pocketA - pocketB;
     }
   });
 
