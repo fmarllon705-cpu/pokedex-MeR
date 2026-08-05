@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pokédex do Casal</title>
+  <title>Pokédex</title>
 
   <!-- PWA Manifest & Tema -->
   <link rel="manifest" href="manifest.json">
@@ -72,10 +72,34 @@
             <!-- CARD DE PREVIEW DA BUSCA -->
             <div id="search-result" class="text-center p-3 border rounded bg-body-secondary">
               <i id="poke-placeholder-icon" class="bi bi-card-image fs-1 text-muted"></i>
-              <img id="poke-img" src="" alt="" style="display: none; max-width: 130px;">
+              <img id="poke-img" src="" alt="" style="display: none; max-width: 120px;">
               <h5 id="poke-name" class="mt-2 text-capitalize fw-bold">-</h5>
               <p id="poke-id-display" class="text-muted small">#---</p>
               
+              <!-- DETALHES DE COLECIONADOR (NOVO) -->
+              <div id="collector-details" class="row g-2 mb-3" style="display: none;">
+                <div class="col-6">
+                  <select id="card-lang" class="form-select form-select-sm">
+                    <option value="PT-BR">🇧🇷 PT-BR</option>
+                    <option value="EN">🇺🇸 EN</option>
+                    <option value="JP">🇯🇵 JP</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <select id="card-condition" class="form-select form-select-sm">
+                    <option value="NM">Near Mint (NM)</option>
+                    <option value="SP">Slightly Played (SP)</option>
+                    <option value="MP">Moderately Played (MP)</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <div class="form-check form-switch text-start ms-2">
+                    <input class="form-check-input" type="checkbox" id="card-shiny">
+                    <label class="form-check-label small fw-bold" for="card-shiny">Versão Shiny ✨</label>
+                  </div>
+                </div>
+              </div>
+
               <div class="p-2 border rounded bg-body mb-3">
                 <small class="d-block text-muted">Posição Recomendada:</small>
                 <strong>Folha: <span id="res-sheet">-</span> | Lado: <span id="res-side">-</span> | Bolso: <span id="res-pocket">-</span></strong>
