@@ -15,6 +15,20 @@ const REGIONS = {
   especiais: { startId: 1026, endId: 9999, startSheet: 115 }
 };
 
+// Dicionário com nomes bonitos das regiões para exibição na interface
+const REGION_NAMES = {
+  kanto: "Kanto",
+  johto: "Johto",
+  hoenn: "Hoenn",
+  sinnoh: "Sinnoh",
+  unova: "Unova",
+  kalos: "Kalos",
+  alola: "Alola",
+  galar: "Galar",
+  paldea: "Paldea",
+  especiais: "Especiais"
+};
+
 // Elementos DOM
 const sectionSelect = document.getElementById('section-select');
 const pokemonInput = document.getElementById('pokemon-input');
@@ -193,8 +207,10 @@ function selectTcgCard(index) {
     addedAt: new Date().toISOString()
   };
 
+  const currentRegionName = REGION_NAMES[sectionSelect.value] || "Região";
+
   pokeName.textContent = card.name;
-  pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} (${card.set.name} - Nº ${card.number})`;
+  pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} - ${currentRegionName} (${card.set.name} - Nº ${card.number})`;
   pokeImg.src = currentPokemon.image;
   pokeImg.style.display = "inline-block";
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
@@ -262,6 +278,12 @@ sectionSelect.addEventListener('change', () => {
   if (currentPokemon) {
     currentPokemon.section = sectionSelect.value;
     calculatePhysicalPosition(currentPokemon.id || 1);
+    
+    // Atualiza também o texto do ID/Região caso o usuário mude de região manualmente
+    const currentRegionName = REGION_NAMES[sectionSelect.value] || "Região";
+    const currentCardNumMatch = pokeIdDisplay.textContent.match(/\(.*\)/); // Mantém a parte da coleção e número
+    const setPart = currentCardNumMatch ? currentCardNumMatch[0] : "";
+    pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} - ${currentRegionName} ${setPart}`;
   }
 });
 
