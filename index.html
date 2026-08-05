@@ -17,10 +17,10 @@
 <body class="pokedex-body">
 
   <div class="container py-4">
-    <!-- ESTRUTURA DA POKÉDEX (CARCAÇA PRINCIPAL) -->
+    <!-- ESTRUTURA DA POKÉDEX -->
     <div class="pokedex-device shadow-lg mx-auto">
       
-      <!-- TOPO DA POKÉDEX (LENS / LUZES CLÁSSICAS) -->
+      <!-- TOPO DA POKÉDEX -->
       <div class="pokedex-header d-flex align-items-center justify-content-between p-3">
         <div class="d-flex align-items-center gap-2">
           <div class="big-blue-lens"></div>
@@ -60,10 +60,10 @@
       <!-- CORPO PRINCIPAL -->
       <div class="row g-3 px-3 pb-3">
         
-        <!-- LADO ESQUERDO: CONTROLES DE ADIÇÃO & SIMULADOR DE FOLHA 3x3 -->
+        <!-- LADO ESQUERDO: CONTROLES DE ADIÇÃO & SIMULADOR 3x3 -->
         <div class="col-lg-5">
           <div class="pokedex-inner-card p-3">
-            <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-plus-circle"></i> Capturar Pokémon</h5>
+            <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-plus-circle"></i> Capturar Carta</h5>
             
             <div class="mb-2">
               <label class="form-label text-white-50 small fw-bold mb-1">Seção do Fichário</label>
@@ -75,19 +75,27 @@
               </select>
             </div>
 
-            <div class="input-group mb-3">
-              <input type="text" id="pokemon-input" class="form-control form-control-sm pokedex-input" placeholder="Nome ou nº...">
-              <button id="btn-search" class="btn btn-warning fw-bold"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <!-- BUSCA POR NOME E NÚMERO DA CARTA -->
+            <div class="row g-2 mb-3">
+              <div class="col-7">
+                <input type="text" id="pokemon-input" class="form-control form-control-sm pokedex-input" placeholder="Nome (ex: Charizard)">
+              </div>
+              <div class="col-5">
+                <input type="text" id="card-number-input" class="form-control form-control-sm pokedex-input" placeholder="Nº (ex: 4 ou 004)">
+              </div>
+              <div class="col-12">
+                <button id="btn-search" class="btn btn-warning w-100 fw-bold btn-sm"><i class="fa-solid fa-magnifying-glass"></i> BUSCAR CARTA E PREÇO</button>
+              </div>
             </div>
 
-            <!-- TELA GREEN SCREEN POKÉDEX PREVIEW -->
+            <!-- TELA PREVIEW DA CARTA -->
             <div id="search-result" class="pokedex-screen text-center p-3 mb-2">
               <i id="poke-placeholder-icon" class="fa-solid fa-gamepad fs-1 text-muted py-3"></i>
-              <img id="poke-img" src="" alt="" style="display: none; max-width: 90px;">
+              <img id="poke-img" src="" alt="" style="display: none; max-width: 110px;" class="rounded shadow mb-2">
               <h5 id="poke-name" class="fw-bold text-uppercase mb-0 text-dark">-</h5>
               <p id="poke-id-display" class="small mb-2 text-secondary">#---</p>
               
-              <!-- FORMULÁRIO COMPLEMENTAR -->
+              <!-- DETALHES COM O PREÇO AUTOMÁTICO -->
               <div id="collector-details" class="row g-2 text-start mb-2" style="display: none;">
                 <div class="col-6">
                   <label class="small fw-bold">Idioma</label>
@@ -105,7 +113,7 @@
                     <option value="MP">Moderately Played</option>
                   </select>
                 </div>
-                <div class="col-12">
+                <div class="col-6">
                   <label class="small fw-bold">Acabamento</label>
                   <select id="card-finish" class="form-select form-select-sm">
                     <option value="Normal">Normal (Regular)</option>
@@ -115,10 +123,8 @@
                   </select>
                 </div>
                 <div class="col-6">
-                  <input type="text" id="card-number" class="form-control form-control-sm" placeholder="Nº da Carta">
-                </div>
-                <div class="col-6">
-                  <input type="number" step="0.5" id="card-price" class="form-control form-control-sm" placeholder="Preço R$">
+                  <label class="small fw-bold text-success"><i class="fa-solid fa-robot"></i> Preço (Auto R$)</label>
+                  <input type="number" step="0.01" id="card-price" class="form-control form-control-sm border-success fw-bold" placeholder="Auto R$">
                 </div>
                 <div class="col-12">
                   <div class="form-check form-switch">
@@ -128,7 +134,7 @@
                 </div>
               </div>
 
-              <!-- VISUALIZADOR DA FOLHA FÍSICA (SIMULADOR 3x3 ESTILO APONTADO) -->
+              <!-- SIMULADOR 3x3 -->
               <div id="binder-visualizer" class="binder-preview-container p-2 rounded mb-2">
                 <div class="binder-header-info d-flex justify-content-between align-items-center px-2 py-1 mb-2">
                   <span class="sheet-badge-num fw-bold" id="res-sheet-badge">Folha --</span>
@@ -136,7 +142,6 @@
                   <span class="sheet-badge-pocket fw-bold" id="res-pocket-badge">Bolso -</span>
                 </div>
                 
-                <!-- GRID FÍSICO 9 POCKETS (3x3) -->
                 <div class="binder-grid-3x3">
                   <div class="pocket-slot" data-pocket="1">1</div>
                   <div class="pocket-slot" data-pocket="2">2</div>
