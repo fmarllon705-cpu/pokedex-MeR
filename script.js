@@ -207,19 +207,27 @@ function selectTcgCard(index) {
     addedAt: new Date().toISOString()
   };
 
-  // Garante que pega a região correta mesmo se o ID demorou para carregar
   const activeSection = currentPokemon.id ? detectRegionByNationalId(currentPokemon.id) : sectionSelect.value;
   const currentRegionName = REGION_NAMES[activeSection] || "Região";
   const formattedNationalId = String(currentPokemon.id || 0).padStart(3, '0');
 
   pokeName.textContent = card.name;
-  
-  // Exibe explicitamente o ID, Região e Coleção
   pokeIdDisplay.textContent = `#${formattedNationalId} - ${currentRegionName} (${card.set.name} - Nº ${card.number})`;
   
   pokeImg.src = currentPokemon.image;
   pokeImg.style.display = "inline-block";
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
+
+  // MUDANÇA DINÂMICA DE COR DO FUNDO DA TELA BASEADA NO TIPO DA CARTA
+  const searchResultScreen = document.getElementById('search-result');
+  searchResultScreen.className = searchResultScreen.className.replace(/type-\w+/g, '').trim();
+  
+  if (card.types && card.types.length > 0) {
+    const primaryType = card.types[0].toLowerCase();
+    searchResultScreen.classList.add(`type-${primaryType}`);
+  } else {
+    searchResultScreen.classList.add('type-colorless');
+  }
 
   cardShiny.checked = false;
   cardPrice.value = calculatedPrice;
@@ -231,12 +239,20 @@ function selectTcgCard(index) {
   calculatePhysicalPosition(currentPokemon.id || 1);
 }
 
+cardShiny.addEventListener('change', () => {
+  if (!currentPokemon) return;
+  if (rawPokemonSprites.shiny && cardShiny.checked) {
+    pokeImg.src = rawPokemonSprites.shiny;
+  } else {
+    pokeImg.src = currentPokemon.image;
+  }
+});
+
 // 3. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3 BASEADO NA REGIÃO
 function calculatePhysicalPosition(nationalId) {
   const regionKey = sectionSelect.value;
   const regionConfig = REGIONS[regionKey] || REGIONS.kanto;
 
-  // Offset relativo dentro da região baseada na Pokedex Nacional
   const relativeIndex = Math.max(0, nationalId - regionConfig.startId);
 
   const sheetOffset = Math.floor(relativeIndex / 18);
@@ -276,11 +292,12 @@ sectionSelect.addEventListener('change', () => {
     currentPokemon.section = sectionSelect.value;
     calculatePhysicalPosition(currentPokemon.id || 1);
     
-    // Atualiza também o texto do ID/Região caso o usuário mude de região manualmente
-    const currentRegionName = REGION_NAMES[sectionSelect.value] || "Região";
-    const currentCardNumMatch = pokeIdDisplay.textContent.match(/\(.*\)/); // Mantém a parte da coleção e número
+    const activeSection = currentPokemon.id ? detectRegionByNationalId(currentPokemon.id) : sectionSelect.value;
+    const currentRegionName = REGION_NAMES[activeSection] || "Região";
+    const currentCardNumMatch = pokeIdDisplay.textContent.match(/\(.*\)/);
     const setPart = currentCardNumMatch ? currentCardNumMatch[0] : "";
-    pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} - ${currentRegionName} ${setPart}`;
+    const formattedNationalId = String(currentPokemon.id || 0).padStart(3, '0');
+    pokeIdDisplay.textContent = `#${formattedNationalId} - ${currentRegionName} ${setPart}`;
   }
 });
 
