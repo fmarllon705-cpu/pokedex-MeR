@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-bs-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,12 +20,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-light">
+<body class="bg-body-tertiary">
 
   <nav class="navbar navbar-dark bg-danger mb-4 shadow-sm">
     <div class="container d-flex justify-content-between align-items-center">
       <span class="navbar-brand mb-0 h1">Pokédex do Casal ❤️</span>
-      <button id="btn-backup" class="btn btn-outline-light btn-sm"><i class="bi bi-download me-1"></i> Backup</button>
+      <div>
+        <button id="btn-theme" class="btn btn-outline-light btn-sm me-2"><i class="bi bi-moon-stars"></i></button>
+        <button id="btn-backup" class="btn btn-outline-light btn-sm"><i class="bi bi-download me-1"></i> Backup</button>
+      </div>
     </div>
   </nav>
 
@@ -49,7 +52,7 @@
       <div class="col-md-5">
         <div class="card shadow-sm border-0">
           <div class="card-body">
-            <h5 class="card-title fw-bold mb-3">Adicionar Carta</h5>
+            <h5 class="card-title fw-bold mb-3"><i class="bi bi-plus-circle me-1 text-danger"></i> Adicionar Carta</h5>
             
             <div class="mb-3">
               <label class="form-label">Seção do Fichário</label>
@@ -67,32 +70,52 @@
             </div>
 
             <!-- CARD DE PREVIEW DA BUSCA -->
-            <div id="search-result" class="text-center p-3 border rounded bg-white">
+            <div id="search-result" class="text-center p-3 border rounded bg-body-secondary">
               <i id="poke-placeholder-icon" class="bi bi-card-image fs-1 text-muted"></i>
               <img id="poke-img" src="" alt="" style="display: none; max-width: 130px;">
               <h5 id="poke-name" class="mt-2 text-capitalize fw-bold">-</h5>
               <p id="poke-id-display" class="text-muted small">#---</p>
               
-              <div class="p border rounded bg-light mb-3">
+              <div class="p-2 border rounded bg-body mb-3">
                 <small class="d-block text-muted">Posição Recomendada:</small>
                 <strong>Folha: <span id="res-sheet">-</span> | Lado: <span id="res-side">-</span> | Bolso: <span id="res-pocket">-</span></strong>
               </div>
 
               <button id="btn-save" class="btn btn-success w-100 fw-bold" style="display: none;">
-                <i class="bi bi-plus-circle me-1"></i> Salvar na Nuvem
+                <i class="bi bi-cloud-arrow-up me-1"></i> Salvar na Nuvem
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- LISTA DE CARDS NA NUVEM -->
+      <!-- LISTA DE CARDS COM FILTROS -->
       <div class="col-md-7">
         <div class="card shadow-sm border-0">
           <div class="card-body">
-            <h5 class="card-title fw-bold mb-3">
-              Cartas Registradas (<span id="collection-count">0</span>)
-            </h5>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title fw-bold mb-0">
+                Cartas (<span id="collection-count">0</span>)
+              </h5>
+            </div>
+
+            <!-- BARRA DE FILTROS DA COLEÇÃO -->
+            <div class="row g-2 mb-3">
+              <div class="col-7">
+                <select id="filter-section" class="form-select form-select-sm">
+                  <option value="all">Todas as Seções</option>
+                  <option value="main">National Dex</option>
+                  <option value="fullart">Full Art / Secretas</option>
+                  <option value="valuable">Valiosas</option>
+                  <option value="cute">Fofos</option>
+                </select>
+              </div>
+              <div class="col-5">
+                <input type="number" id="filter-sheet" class="form-control form-select-sm" placeholder="Nº Folha..." min="1" max="100">
+              </div>
+            </div>
+
+            <!-- GRID DE CARTAS -->
             <div id="collection-grid" class="d-flex flex-wrap gap-2"></div>
           </div>
         </div>
