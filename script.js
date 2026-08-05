@@ -26,19 +26,22 @@ const resPocket = document.getElementById('res-pocket');
 const collectorDetails = document.getElementById('collector-details');
 const cardLang = document.getElementById('card-lang');
 const cardCondition = document.getElementById('card-condition');
+const cardNumber = document.getElementById('card-number');
+const cardPrice = document.getElementById('card-price');
 const cardShiny = document.getElementById('card-shiny');
 
 const collectionGrid = document.getElementById('collection-grid');
 const collectionCount = document.getElementById('collection-count');
 const progressBar = document.getElementById('progress-bar');
 const progressPercent = document.getElementById('progress-percent');
+const totalValueDisplay = document.getElementById('total-value-display');
 
 const filterSection = document.getElementById('filter-section');
 const filterSheet = document.getElementById('filter-sheet');
 
 let currentPokemon = null;
 let currentRawData = null;
-let rawPokemonSprites = {}; // Guarda sprites normal e shiny
+let rawPokemonSprites = {};
 
 // 1. BUSCAR POKÉMON NA POKÉAPI
 async function searchPokemon() {
@@ -61,7 +64,9 @@ async function searchPokemon() {
       shiny: data.sprites.front_shiny || data.sprites.other['official-artwork'].front_shiny || data.sprites.front_default
     };
 
-    cardShiny.checked = false; // Reset switch shiny
+    cardShiny.checked = false;
+    cardNumber.value = "";
+    cardPrice.value = "";
 
     currentPokemon = {
       id: data.id,
@@ -91,7 +96,7 @@ async function searchPokemon() {
   }
 }
 
-// Chavear sprite Shiny
+// Alternar sprite Shiny
 cardShiny.addEventListener('change', () => {
   if (!currentPokemon) return;
   currentPokemon.image = cardShiny.checked ? rawPokemonSprites.shiny : rawPokemonSprites.default;
@@ -145,9 +150,10 @@ const collectionRef = database.ref('pokedexCollection');
 btnSave.addEventListener('click', () => {
   if (!currentPokemon) return;
 
-  // Adiciona detalhes extras de colecionador
   currentPokemon.lang = cardLang.value;
   currentPokemon.condition = cardCondition.value;
+  currentPokemon.cardNumber = cardNumber.value.trim();
+  currentPokemon.price = parseFloat(cardPrice.value) || 0;
   currentPokemon.isShiny = cardShiny.checked;
 
   const newCardRef = collectionRef.push();
@@ -160,7 +166,7 @@ btnSave.addEventListener('click', () => {
   });
 });
 
-// 5. ESCUTAR MUDANÇAS & RENDERIZAR COM FILTROS E TAGS
+// 5. ESCUTAR MUDANÇAS & RENDERIZAR
 collectionRef.on('value', (snapshot) => {
   const data = snapshot.val();
   currentRawData = data;
@@ -171,6 +177,7 @@ function renderCollection() {
   collectionGrid.innerHTML = "";
   if (!currentRawData) {
     collectionCount.textContent = "0";
+    totalValueDisplay.textContent = "R$ 0,00";
     updateProgressBar(0);
     return;
   }
@@ -178,6 +185,10 @@ function renderCollection() {
   const items = Object.entries(currentRawData);
   collectionCount.textContent = items.length;
   updateProgressBar(items.length);
+
+  // Calcula valor total de toda a coleção
+  const totalValue = items.reduce((acc, [_, item]) => acc + (parseFloat(item.price) || 0), 0);
+  totalValueDisplay.textContent = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const selectedSection = filterSection.value;
   const selectedSheet = parseInt(filterSheet.value, 10);
@@ -191,21 +202,25 @@ function renderCollection() {
   filteredItems.forEach(([key, item]) => {
     const card = document.createElement('div');
     card.classList.add('p-2', 'border', 'rounded', 'bg-body-secondary', 'text-center', 'position-relative');
-    card.style.width = "110px";
+    card.style.width = "120px";
     
     const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1 fs-8">✨</span>' : '';
-    const langBadge = item.lang ? `<span class="badge bg-secondary me-1" style="font-size: 0.6rem;">${item.lang}</span>` : '';
-    const condBadge = item.condition ? `<span class="badge bg-dark" style="font-size: 0.6rem;">${item.condition}</span>` : '';
+    const langBadge = item.lang ? `<span class="badge bg-secondary me-1" style="font-size: 0.55rem;">${item.lang}</span>` : '';
+    const condBadge = item.condition ? `<span class="badge bg-dark" style="font-size: 0.55rem;">${item.condition}</span>` : '';
+    const numDisplay = item.cardNumber ? `<small class="d-block text-muted" style="font-size: 0.65rem;">№ ${item.cardNumber}</small>` : '';
+    const priceDisplay = item.price ? `<span class="d-block text-success fw-bold" style="font-size: 0.7rem;">R$ ${parseFloat(item.price).toFixed(2)}</span>` : '';
 
     card.innerHTML = `
       ${shinyBadge}
       <button class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 p-0 me-1 mt-1" onclick="removePokemon('${key}')">
         <i class="bi bi-x-circle-fill"></i>
       </button>
-      <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: contain;">
+      <img src="${item.image}" alt="${item.name}" style="width: 55px; height: 55px; object-fit: contain;">
       <span class="d-block text-capitalize fw-bold text-truncate small mt-1">${item.name}</span>
-      <div class="mb-1">${langBadge}${condBadge}</div>
-      <span class="badge bg-warning text-dark w-100" style="font-size: 0.65rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
+      ${numDisplay}
+      <div class="my-1">${langBadge}${condBadge}</div>
+      ${priceDisplay}
+      <span class="badge bg-warning text-dark w-100 mt-1" style="font-size: 0.65rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
     `;
     collectionGrid.appendChild(card);
   });
