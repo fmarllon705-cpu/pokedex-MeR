@@ -1,121 +1,125 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-bs-theme="light">
+<html lang="pt-BR" data-bs-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pokédex do Casal ❤️</title>
-
-  <!-- PWA Manifest & Tema -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#dc0a2d">
-
-  <!-- Fontes e Ícones Garantidos -->
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Estilos Customizados -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="pokedex-body">
 
   <div class="container py-4">
     <!-- ESTRUTURA DA POKÉDEX -->
-    <div class="pokedex-device shadow-lg mx-auto">
+    <div class="pokedex-device p-3 p-md-4">
       
-      <!-- TOPO DA POKÉDEX -->
-      <div class="pokedex-header d-flex align-items-center justify-content-between p-3">
+      <!-- TOPO DA POKÉDEX (LUZES E TÍTULO) -->
+      <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary">
         <div class="d-flex align-items-center gap-2">
           <div class="big-blue-lens"></div>
           <div class="mini-light bg-danger"></div>
           <div class="mini-light bg-warning"></div>
           <div class="mini-light bg-success"></div>
         </div>
-        <div class="d-flex gap-2">
-          <button id="btn-theme" class="btn btn-pokedex-tool btn-sm"><i class="fa-solid fa-moon"></i></button>
-          <button id="btn-backup" class="btn btn-pokedex-tool btn-sm"><i class="fa-solid fa-download"></i> Backup</button>
-        </div>
+        <h3 class="brand-title m-0 fw-bold text-uppercase text-light fs-4 text-center">
+          Pokédex do Casal <i class="fa-solid fa-heart text-danger"></i>
+        </h3>
+        <button id="btn-theme" class="btn btn-sm btn-outline-light rounded-circle" title="Alternar Tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
       </div>
 
-      <h3 class="text-white fw-bold text-center my-2 brand-title">POKÉDEX DO CASAL ❤️</h3>
-
-      <!-- PAINEL SUPERIOR: PROGRESSO & VALOR -->
-      <div class="row g-2 px-3 mb-3">
+      <!-- PAINEL SUPERIOR: PROGRESSO E VALOR -->
+      <div class="row g-3 mb-4">
         <div class="col-md-7">
-          <div class="screen-box p-2">
+          <div class="screen-box p-3 h-100 d-flex flex-column justify-content-center">
             <div class="d-flex justify-content-between align-items-center mb-1">
-              <span class="screen-label"><i class="fa-solid fa-book-open"></i> Progresso Coleção</span>
-              <span id="progress-percent" class="badge bg-danger">0%</span>
+              <span class="screen-label"><i class="fa-solid fa-chart-line"></i> Progresso Coleção</span>
+              <span id="progress-percent" class="badge bg-danger fs-6">0.0%</span>
             </div>
             <div class="progress" style="height: 14px;">
-              <div id="progress-bar" class="progress-bar bg-warning progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
+              <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
             </div>
           </div>
         </div>
         <div class="col-md-5">
-          <div class="screen-box p-2 text-end">
-            <span class="screen-label d-block"><i class="fa-solid fa-coins"></i> Valor Estimado</span>
-            <h4 id="total-value-display" class="fw-bold mb-0 text-warning">R$ 0,00</h4>
+          <div class="screen-box p-3 h-100 text-end d-flex flex-column justify-content-center">
+            <span class="screen-label text-start"><i class="fa-solid fa-sack-dollar"></i> Valor Estimado</span>
+            <h2 id="total-value-display" class="fw-bold text-warning mb-0 fs-3">R$ 0,00</h2>
           </div>
         </div>
       </div>
 
-      <!-- CORPO PRINCIPAL -->
-      <div class="row g-3 px-3 pb-3">
+      <!-- CORPO PRINCIPAL: BUSCA (ESQUERDA) E FICHÁRIO (DIREITA) -->
+      <div class="row g-4">
         
-        <!-- LADO ESQUERDO: CONTROLES DE ADIÇÃO & SIMULADOR 3x3 -->
+        <!-- COLUNA DA ESQUERDA: CAPTURAR CARTA -->
         <div class="col-lg-5">
           <div class="pokedex-inner-card p-3">
-            <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-plus-circle"></i> Capturar Carta</h5>
+            <h5 class="fw-bold mb-3 text-warning"><i class="fa-solid fa-circle-plus"></i> Capturar Carta</h5>
             
             <div class="mb-2">
-              <label class="form-label text-white-50 small fw-bold mb-1">Seção do Fichário</label>
-              <select id="section-select" class="form-select form-select-sm pokedex-input">
+              <label class="form-label small text-light fw-bold mb-1">Seção do Fichário</label>
+              <select id="section-select" class="form-select pokedex-input">
                 <option value="main">National Dex (Folha 1+)</option>
-                <option value="fullart">Full Art / Secretas (Folha 61+)</option>
-                <option value="valuable">Valiosas / RARAS (Folha 76+)</option>
-                <option value="cute">Fofos / Favoritos (Folha 89+)</option>
+                <option value="fullart">Full Arts / Secretas (Folha 61+)</option>
+                <option value="valuable">Valiosas / Raras (Folha 76+)</option>
+                <option value="cute">Fofos / Especiais (Folha 89+)</option>
               </select>
             </div>
 
-            <!-- BUSCA POR NOME E NÚMERO DA CARTA -->
             <div class="row g-2 mb-3">
               <div class="col-7">
-                <input type="text" id="pokemon-input" class="form-control form-control-sm pokedex-input" placeholder="Nome (ex: Charizard)">
+                <input type="text" id="pokemon-input" class="form-control pokedex-input" placeholder="Nome (ex: Drifloon)">
               </div>
               <div class="col-5">
-                <input type="text" id="card-number-input" class="form-control form-control-sm pokedex-input" placeholder="Nº (ex: 4 ou 004)">
-              </div>
-              <div class="col-12">
-                <button id="btn-search" class="btn btn-warning w-100 fw-bold btn-sm"><i class="fa-solid fa-magnifying-glass"></i> BUSCAR CARTA E PREÇO</button>
+                <input type="text" id="card-number-input" class="form-control pokedex-input" placeholder="Nº (ex: 5 ou 005)">
               </div>
             </div>
 
-            <!-- TELA PREVIEW DA CARTA -->
+            <button id="btn-search" class="btn btn-warning w-100 fw-bold mb-3 text-uppercase shadow-sm btn-pokedex-action">
+              <i class="fa-solid fa-magnifying-glass"></i> Buscar Carta e Preço
+            </button>
+
+            <!-- TELA PREVIEW DA CARTA E SELETOR DE EDIÇÕES -->
             <div id="search-result" class="pokedex-screen text-center p-3 mb-2">
               <i id="poke-placeholder-icon" class="fa-solid fa-gamepad fs-1 text-muted py-3"></i>
-              <img id="poke-img" src="" alt="" style="display: none; max-width: 110px;" class="rounded shadow mb-2">
+              <img id="poke-img" src="" alt="" style="display: none; max-width: 130px;" class="rounded shadow mb-2">
               <h5 id="poke-name" class="fw-bold text-uppercase mb-0 text-dark">-</h5>
               <p id="poke-id-display" class="small mb-2 text-secondary">#---</p>
               
+              <!-- SELETOR DE EDIÇÃO/COLEÇÃO -->
+              <div id="set-selector-container" class="mb-2 text-start" style="display: none;">
+                <label class="small fw-bold text-dark"><i class="fa-solid fa-layer-group"></i> Selecionar Versão/Arte:</label>
+                <select id="card-set-select" class="form-select form-select-sm border-warning fw-bold text-dark bg-white"></select>
+              </div>
+
               <!-- DETALHES COM O PREÇO AUTOMÁTICO -->
               <div id="collector-details" class="row g-2 text-start mb-2" style="display: none;">
                 <div class="col-6">
-                  <label class="small fw-bold">Idioma</label>
-                  <select id="card-lang" class="form-select form-select-sm">
+                  <label class="small fw-bold text-dark">Idioma</label>
+                  <select id="card-lang" class="form-select form-select-sm text-dark bg-white">
                     <option value="PT-BR">🇧🇷 PT-BR</option>
                     <option value="EN">🇺🇸 EN</option>
                     <option value="JP">🇯🇵 JP</option>
                   </select>
                 </div>
                 <div class="col-6">
-                  <label class="small fw-bold">Condição</label>
-                  <select id="card-condition" class="form-select form-select-sm">
+                  <label class="small fw-bold text-dark">Condição</label>
+                  <select id="card-condition" class="form-select form-select-sm text-dark bg-white">
                     <option value="NM">Near Mint</option>
                     <option value="SP">Slightly Played</option>
                     <option value="MP">Moderately Played</option>
                   </select>
                 </div>
                 <div class="col-6">
-                  <label class="small fw-bold">Acabamento</label>
-                  <select id="card-finish" class="form-select form-select-sm">
+                  <label class="small fw-bold text-dark">Acabamento</label>
+                  <select id="card-finish" class="form-select form-select-sm text-dark bg-white">
                     <option value="Normal">Normal (Regular)</option>
                     <option value="Holo">Holo ✨</option>
                     <option value="Reverse">Reverse Holo 🌟</option>
@@ -124,12 +128,12 @@
                 </div>
                 <div class="col-6">
                   <label class="small fw-bold text-success"><i class="fa-solid fa-robot"></i> Preço (Auto R$)</label>
-                  <input type="number" step="0.01" id="card-price" class="form-control form-control-sm border-success fw-bold" placeholder="Auto R$">
+                  <input type="number" step="0.01" id="card-price" class="form-control form-control-sm border-success fw-bold text-dark bg-white" placeholder="Auto R$">
                 </div>
                 <div class="col-12">
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="card-shiny">
-                    <label class="form-check-label small fw-bold" for="card-shiny">Versão Shiny ✨</label>
+                    <label class="form-check-label small fw-bold text-dark" for="card-shiny">Versão Shiny ✨</label>
                   </div>
                 </div>
               </div>
@@ -157,50 +161,56 @@
 
             </div>
 
-            <button id="btn-save" class="btn btn-success w-100 fw-bold btn-pokedex-action" style="display: none;">
-              <i class="fa-solid fa-floppy-disk me-1"></i> GUARDAR CARTA
+            <button id="btn-save" class="btn btn-success w-100 fw-bold text-uppercase btn-pokedex-action" style="display: none;">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar no Fichário
             </button>
+
           </div>
         </div>
 
-        <!-- LADO DIREITO: FICHÁRIO E COLEÇÃO -->
+        <!-- COLUNA DA DIREITA: CARTAS SALVAS / FICHÁRIO COMPARTILHADO -->
         <div class="col-lg-7">
-          <div class="pokedex-inner-card p-3 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="fw-bold text-white mb-0"><i class="fa-solid fa-layer-group"></i> Fichário (<span id="collection-count">0</span>)</h5>
+          <div class="pokedex-inner-card p-3 h-100 d-flex flex-column">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold m-0 text-light"><i class="fa-solid fa-book-open"></i> Fichário (<span id="collection-count">0</span>)</h5>
+              <button id="btn-backup" class="btn btn-sm btn-pokedex-tool" title="Exportar Backup JSON">
+                <i class="fa-solid fa-download"></i> Backup
+              </button>
             </div>
 
-            <!-- FILTROS POKÉDEX -->
+            <!-- FILTROS DO FICHÁRIO -->
             <div class="row g-2 mb-3">
-              <div class="col-12">
-                <div class="input-group input-group-sm">
-                  <span class="input-group-text bg-dark border-secondary text-white"><i class="fa-solid fa-filter"></i></span>
-                  <input type="text" id="search-saved" class="form-control pokedex-input" placeholder="Buscar no fichário...">
-                </div>
-              </div>
-              <div class="col-4">
+              <div class="col-md-4">
                 <select id="filter-section" class="form-select form-select-sm pokedex-input">
                   <option value="all">Todas Seções</option>
                   <option value="main">National Dex</option>
-                  <option value="fullart">Full Art</option>
-                  <option value="valuable">Valiosas</option>
-                  <option value="cute">Fofos</option>
+                  <option value="fullart">Full Arts / Secretas</option>
+                  <option value="valuable">Valiosas / Raras</option>
+                  <option value="cute">Fofos / Especiais</option>
                 </select>
               </div>
-              <div class="col-4">
-                <input type="number" id="filter-sheet" class="form-control form-select-sm pokedex-input" placeholder="Folha..." min="1">
+              <div class="col-md-3">
+                <input type="number" id="filter-sheet" class="form-control form-control-sm pokedex-input" placeholder="Folha...">
               </div>
-              <div class="col-4">
-                <select id="sort-order" class="form-select form-select-sm pokedex-input">
-                  <option value="sheet">Folha</option>
-                  <option value="price-desc">R$ Maior</option>
-                  <option value="recent">Recentes</option>
-                </select>
+              <div class="col-md-5">
+                <input type="text" id="search-saved" class="form-control form-control-sm pokedex-input" placeholder="Buscar no fichário...">
               </div>
             </div>
 
-            <!-- GRID DAS CARTAS -->
-            <div id="collection-grid" class="pokedex-grid-scroll"></div>
+            <div class="d-flex justify-content-end mb-2">
+              <select id="sort-order" class="form-select form-select-sm pokedex-input w-auto">
+                <option value="sheet">Ordenar por Posição (Folha)</option>
+                <option value="price-desc">Ordenar por Maior Preço</option>
+                <option value="recent">Adicionados Recentemente</option>
+              </select>
+            </div>
+
+            <!-- GRID DE EXIBIÇÃO DAS CARTAS -->
+            <div id="collection-grid" class="pokedex-grid-scroll flex-grow-1">
+              <!-- Cartas inseridas dinamicamente via JS -->
+            </div>
+
           </div>
         </div>
 
@@ -209,9 +219,11 @@
     </div>
   </div>
 
-  <!-- Firebase Legacy SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <!-- Firebase Compatibility Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  
+  <!-- Script Principal -->
   <script src="script.js"></script>
 </body>
 </html>
