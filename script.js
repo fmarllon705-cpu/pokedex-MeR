@@ -222,10 +222,9 @@ function renderCollection() {
 
   filteredItems.forEach(([key, item]) => {
     const card = document.createElement('div');
-    card.classList.add('p-2', 'border', 'rounded', 'bg-body-secondary', 'text-center', 'position-relative');
-    card.style.width = "120px";
+    card.classList.add('poke-card-item'); // Utiliza estilização fluida do style.css
     
-    const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1 fs-8">✨</span>' : '';
+    const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1" style="font-size: 0.6rem;">✨</span>' : '';
     const langBadge = item.lang ? `<span class="badge bg-secondary me-1" style="font-size: 0.55rem;">${item.lang}</span>` : '';
     const condBadge = item.condition ? `<span class="badge bg-dark" style="font-size: 0.55rem;">${item.condition}</span>` : '';
     
@@ -236,14 +235,14 @@ function renderCollection() {
     else if (item.finish === 'Ultra') finishBadge = '<span class="badge bg-danger d-block my-1" style="font-size: 0.55rem;">Ultra 💎</span>';
 
     const numDisplay = item.cardNumber ? `<small class="d-block text-muted" style="font-size: 0.65rem;">№ ${item.cardNumber}</small>` : '';
-    const priceDisplay = item.price ? `<span class="d-block text-success fw-bold" style="font-size: 0.7rem;">R$ ${parseFloat(item.price).toFixed(2)}</span>` : '';
+    const priceDisplay = item.price ? `<span class="d-block text-success fw-bold mt-1" style="font-size: 0.7rem;">R$ ${parseFloat(item.price).toFixed(2)}</span>` : '';
 
     card.innerHTML = `
       ${shinyBadge}
       <button class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 p-0 me-1 mt-1" onclick="removePokemon('${key}')">
         <i class="bi bi-x-circle-fill"></i>
       </button>
-      <img src="${item.image}" alt="${item.name}" style="width: 55px; height: 55px; object-fit: contain;">
+      <img src="${item.image}" alt="${item.name}">
       <span class="d-block text-capitalize fw-bold text-truncate small mt-1">${item.name}</span>
       ${numDisplay}
       ${finishBadge}
