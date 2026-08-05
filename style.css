@@ -34,9 +34,10 @@ body {
   transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
-/* ==========================================
-   PAINEL DE ESTATÍSTICAS (PROGRESSO & VALOR)
-   ========================================== */
+/* Painel de Valor */
+.card.bg-success {
+  background: linear-gradient(135deg, #198754, #0f5132) !important;
+}
 
 .progress {
   border-radius: 10px;
@@ -48,110 +49,96 @@ body {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.card.bg-success {
-  background: linear-gradient(135deg, #198754, #0f5132) !important;
-}
-
-/* ==========================================
-   PREVIEW DA CARTA & BUSCA
-   ========================================== */
-
-#search-result {
-  border-radius: 14px !important;
-  transition: all var(--transition-speed) ease;
-}
-
+/* PREVIEW DA CARTA */
 #poke-img {
-  filter: drop-shadow(0px 8px 12px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0px 6px 10px rgba(0, 0, 0, 0.15));
   transition: transform var(--transition-speed) ease;
 }
 
 #poke-img:hover {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 /* ==========================================
-   CARDS DA COLEÇÃO (ESTILO CARD POKÉMON TCG)
+   GRID E CARDS DA COLEÇÃO (RESPONSIVO E DINÂMICO)
    ========================================== */
 
 #collection-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
-  gap: 12px;
-  justify-content: center;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  width: 100%;
 }
 
-#collection-grid > div {
-  width: 100% !important; /* Sobrescreve largura fixa inline */
+.poke-card-item {
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
   border-radius: 12px !important;
-  background: var(--card-bg-light);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition: all var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 8px !important;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 8px !important;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
-/* Efeito Hover nos cards do fichário */
-#collection-grid > div:hover {
+.poke-card-item:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.poke-card-item img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  margin: 0 auto;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.1));
 }
 
 /* Dark Mode para os cards do fichário */
-[data-bs-theme="dark"] #collection-grid > div {
+[data-bs-theme="dark"] .poke-card-item {
   background: #2b3035;
   border-color: #373b3e !important;
 }
 
-/* Imagem da carta no fichário */
-#collection-grid img {
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-  margin: 0 auto;
-}
-
-/* Badges e Textos nos Cards */
+/* Badges */
 .badge {
   font-weight: 600;
-  border-radius: 6px;
 }
 
 /* ==========================================
-   OTIMIZAÇÃO PARA SMARTPHONES (MOBILE)
+   OTIMIZAÇÃO MOBILE (SMARTPHONES)
    ========================================== */
 
 @media (max-width: 576px) {
   .container {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .navbar-brand {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
 
-  /* Grid ajustado para 3 colunas perfeitas no celular */
+  /* Grid com 3 colunas perfeitas no smartphone */
   #collection-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 6px;
   }
 
-  /* Reduz levemente fontes nos cards para caber em telas pequenas */
-  #collection-grid > div {
-    padding: 6px !important;
+  .poke-card-item {
+    padding: 6px 4px !important;
   }
 
-  #collection-grid img {
-    width: 48px !important;
-    height: 48px !important;
+  .poke-card-item img {
+    width: 45px;
+    height: 45px;
   }
 
-  /* Formas de input e botões maiores para facilitar o toque */
   .btn, .form-select, .form-control {
-    min-height: 38px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 }
