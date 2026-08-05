@@ -207,10 +207,16 @@ function selectTcgCard(index) {
     addedAt: new Date().toISOString()
   };
 
-  const currentRegionName = REGION_NAMES[sectionSelect.value] || "Região";
+  // Garante que pega a região correta mesmo se o ID demorou para carregar
+  const activeSection = currentPokemon.id ? detectRegionByNationalId(currentPokemon.id) : sectionSelect.value;
+  const currentRegionName = REGION_NAMES[activeSection] || "Região";
+  const formattedNationalId = String(currentPokemon.id || 0).padStart(3, '0');
 
   pokeName.textContent = card.name;
-  pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} - ${currentRegionName} (${card.set.name} - Nº ${card.number})`;
+  
+  // Exibe explicitamente o ID, Região e Coleção
+  pokeIdDisplay.textContent = `#${formattedNationalId} - ${currentRegionName} (${card.set.name} - Nº ${card.number})`;
+  
   pokeImg.src = currentPokemon.image;
   pokeImg.style.display = "inline-block";
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
@@ -224,15 +230,6 @@ function selectTcgCard(index) {
 
   calculatePhysicalPosition(currentPokemon.id || 1);
 }
-
-cardShiny.addEventListener('change', () => {
-  if (!currentPokemon) return;
-  if (rawPokemonSprites.shiny && cardShiny.checked) {
-    pokeImg.src = rawPokemonSprites.shiny;
-  } else {
-    pokeImg.src = currentPokemon.image;
-  }
-});
 
 // 3. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3 BASEADO NA REGIÃO
 function calculatePhysicalPosition(nationalId) {
