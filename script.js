@@ -57,7 +57,7 @@ let foundCardsList = [];
 let currentNationalId = 0;
 let currentTypedNumber = '';
 
-// 1. BUSCA INTELIGENTE NA POKÉMON TCG API
+// 1. BUSCA INTELIGENTE NA POKÉMON TCG API (ATUALIZADA PARA PROMOS MEP)
 async function searchPokemon() {
   const queryName = pokemonInput.value.trim().toLowerCase();
   let queryNumber = cardNumberInput.value.trim();
@@ -86,27 +86,45 @@ async function searchPokemon() {
       };
     }
 
+    // Estratégia de busca otimizada para abranger Promos (MEP / Black Star)
+    let found = [];
+
+    // 1. Tenta buscar pelo nome exato + número se informado
     let tcgQuery = `name:"${queryName}"`;
     if (cleanNumber) {
-      tcgQuery += ` (number:"${cleanNumber}" OR number:"${queryNumber.split('/')[0]}")`;
+      tcgQuery += ` (number:"${cleanNumber}" OR number:"0${cleanNumber}" OR number:"00${cleanNumber}")`;
     }
 
     let tcgResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(tcgQuery)}&orderBy=-set.releaseDate`);
     let tcgData = await tcgResponse.json();
-    foundCardsList = tcgData.data || [];
+    found = tcgData.data || [];
 
-    if (foundCardsList.length === 0) {
-      const fallbackResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${queryName}"&orderBy=-set.releaseDate&pageSize=30`);
-      const fallbackData = await fallbackResponse.json();
-      foundCardsList = fallbackData.data || [];
+    // 2. Se não vier nada ou se for carta promo, busca por nome e filtra pelo número nas promos/conjuntos
+    if (found.length === 0 && cleanNumber) {
+      const promoQuery = `name:"${queryName}" number:"${cleanNumber}"`;
+      const promoResp = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(promoQuery)}`);
+      const promoData = await promoResp.json();
+      found = promoData.data || [];
     }
+
+    // 3. Fallback final: traz todas as versões do Pokémon para você escolher no menu dropdown
+    if (found.length === 0) {
+      const fallbackResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${queryName}"&orderBy=-set.releaseDate&pageSize=50`);
+      const fallbackData = await fallbackResponse.json();
+      found = fallbackData.data || [];
+    }
+
+    foundCardsList = found;
 
     if (foundCardsList.length > 0) {
       cardSetSelect.innerHTML = "";
       foundCardsList.forEach((card, idx) => {
         const option = document.createElement('option');
         option.value = idx;
-        option.textContent = `[${card.set.name}] Nº ${card.number}/${card.set.printedTotal || '???'}`;
+        // Destaca se for carta de Promoção/Special Set
+        const isPromo = card.set.id.toLowerCase().includes('mep') || card.set.series.toLowerCase().includes('promo');
+        const promoTag = isPromo ? ' ⭐ [PROMO]' : '';
+        option.textContent = `[${card.set.name}] Nº ${card.number}${promoTag}`;
         cardSetSelect.appendChild(option);
       });
 
@@ -114,7 +132,10 @@ async function searchPokemon() {
         setSelectorContainer.style.display = "block";
       }
 
-      selectTcgCard(0);
+      // Se houver uma correspondência exata com o número 005 / 5, seleciona ela automaticamente
+      const matchIndex = foundCardsList.findIndex(c => c.number === cleanNumber || c.number === `0${cleanNumber}` || c.number === `00${cleanNumber}`);
+      selectTcgCard(matchIndex !== -1 ? matchIndex : 0);
+
     } else {
       throw new Error("Nenhuma carta encontrada.");
     }
@@ -129,11 +150,6 @@ async function searchPokemon() {
     resetLocationInfo();
   }
 }
-
-cardSetSelect.addEventListener('change', (e) => {
-  const selectedIndex = parseInt(e.target.value, 10);
-  selectTcgCard(selectedIndex);
-});
 
 // 2. APLICA A CARTA SELECIONADA À TELA
 function selectTcgCard(index) {
