@@ -333,7 +333,7 @@ function renderCollection() {
     card.classList.add('poke-card-item');
     card.style.cursor = 'pointer';
     
-    // Evento de clique para abrir o Pop-up/Modal
+    // Evento de clique para abrir o Pop-up/Modal de detalhes e edição
     card.addEventListener('click', (e) => {
       if (e.target.closest('button')) return; // Evita abrir se clicar direto no botão de excluir
       openCardModal(key, item);
@@ -357,132 +357,184 @@ function renderCollection() {
         <i class="fa-solid fa-circle-xmark"></i>
       </button>
       <img src="${item.image}" alt="${item.name}">
-      <span class="d-block text-capitalize fw-bold text-truncate small mt-1">${item.name}</span>
+      <span class="d-block fw-bold text-truncate text-dark mt-1" style="font-size: 0.75rem;">${item.name}</span>
       ${numDisplay}
+      <div class="mt-1">${langBadge} ${condBadge}</div>
       ${finishBadge}
-      <div class="my-1">${langBadge}${condBadge}</div>
       ${priceDisplay}
-      <span class="badge bg-warning text-dark w-100 mt-1" style="font-size: 0.6rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
+      <div class="badge bg-warning text-dark mt-1" style="font-size: 0.6rem;">F. ${item.location?.sheet || '--'} (${item.location?.side || '---'} / B. ${item.location?.pocket || '-'})</div>
     `;
+
     collectionGrid.appendChild(card);
   });
 }
 
-// 7. FUNÇÃO PARA POPULAR, EDITAR E ABRIR O MODAL DA CARTA
+function updateProgressBar(count) {
+  const percent = Math.min((count / TOTAL_SLOTS) * 100, 100).toFixed(1);
+  progressBar.style.width = `${percent}%`;
+  progressPercent.textContent = `${percent}%`;
+}
+
+// 7. FUNÇÕES DO MODAL E EDIÇÃO
+let currentEditingKey = null;
+const cardModalElement = document.getElementById('cardModal');
+const cardModal = new bootstrap.Modal(cardModalElement);
+
+const modalCardTitle = document.getElementById('modalCardTitle');
+const modalCardImg = document.getElementById('modalCardImg');
+const modalCardSet = document.getElementById('modalCardSet');
+const modalCardNumber = document.getElementById('modalCardNumber');
+const modalCardLang = document.getElementById('modalCardLang');
+const modalCardCondition = document.getElementById('modalCardCondition');
+const modalCardFinish = document.getElementById('modalCardFinish');
+const modalCardPrice = document.getElementById('modalCardPrice');
+const modalCardLocation = document.getElementById('modalCardLocation');
+
+const modalViewMode = document.getElementById('modalViewMode');
+const modalEditMode = document.getElementById('modalEditMode');
+const modalShinyCheckContainer = document.getElementById('modalShinyCheckContainer');
+const modalEditShiny = document.getElementById('modalEditShiny');
+
+const modalEditSection = document.getElementById('modalEditSection');
+const modalEditLang = document.getElementById('modalEditLang');
+const modalEditCondition = document.getElementById('modalEditCondition');
+const modalEditFinish = document.getElementById('modalEditFinish');
+const modalEditPrice = document.getElementById('modalEditPrice');
+
+const modalBtnEditToggle = document.getElementById('modalBtnEditToggle');
+const modalBtnSave = document.getElementById('modalBtnSave');
+const modalBtnRemove = document.getElementById('modalBtnRemove');
+
+let isEditModeActive = false;
+
 function openCardModal(key, item) {
-  // Elementos do Modal
-  const modalTitle = document.getElementById('modalCardTitle');
-  const modalImg = document.getElementById('modalCardImg');
-  const modalSet = document.getElementById('modalCardSet');
-  const modalNumber = document.getElementById('modalCardNumber');
-  const modalLang = document.getElementById('modalCardLang');
-  const modalCondition = document.getElementById('modalCardCondition');
-  const modalFinish = document.getElementById('modalCardFinish');
-  const modalPrice = document.getElementById('modalCardPrice');
-  const modalLocation = document.getElementById('modalCardLocation');
-
-  // Elementos de Edição
-  const viewMode = document.getElementById('modalViewMode');
-  const editMode = document.getElementById('modalEditMode');
-  const shinyContainer = document.getElementById('modalShinyCheckContainer');
-  const btnEditToggle = document.getElementById('modalBtnEditToggle');
-  const btnSaveModal = document.getElementById('modalBtnSave');
-  const btnRemoveModal = document.getElementById('modalBtnRemove');
-
-  // Inputs de Edição
-  const editSection = document.getElementById('modalEditSection');
-  const editLang = document.getElementById('modalEditLang');
-  const editCondition = document.getElementById('modalEditCondition');
-  const editFinish = document.getElementById('modalEditFinish');
-  const editPrice = document.getElementById('modalEditPrice');
-  const editShiny = document.getElementById('modalEditShiny');
-
-  // Preenche dados padrão na visualização
-  modalTitle.textContent = `${item.name}${item.isShiny ? '✨' : ''}`;
-  modalImg.src = item.image;
-  modalSet.textContent = item.setName || 'Desconhecida';
-  modalNumber.textContent = item.cardNumber || '---';
-  modalLang.textContent = item.lang || 'PT-BR';
-  modalCondition.textContent = item.condition || 'NM';
-  modalFinish.textContent = item.finish || 'Normal';
-  modalPrice.textContent = `R$ ${parseFloat(item.price || 0).toFixed(2)}`;
+  currentEditingKey = key;
+  isEditModeActive = false;
   
-  if (item.location) {
-    modalLocation.textContent = `Folha ${item.location.sheet} (${item.location.side}) - Bolso${item.location.pocket}`;
-  } else {
-    modalLocation.textContent = `---`;
-  }
+  // Reseta visualização do modal para o modo padrão de leitura
+  modalViewMode.classList.remove('d-none');
+  modalEditMode.classList.add('d-none');
+  modalShinyCheckContainer.classList.add('d-none');
+  modalBtnEditToggle.classList.remove('d-none');
+  modalBtnSave.classList.add('d-none');
+  modalBtnEditToggle.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar';
 
-  // Preenche inputs com os valores atuais caso clique em editar
-  editSection.value = item.section || 'main';
-  editLang.value = item.lang || 'PT-BR';
-  editCondition.value = item.condition || 'NM';
-  editFinish.value = item.finish || 'Normal';
-  editPrice.value = item.price || 0;
-  editShiny.checked = !!item.isShiny;
+  // Preenche dados visuais
+  modalCardTitle.textContent = item.name;
+  modalCardImg.src = item.image;
+  modalCardSet.textContent = item.setName || '---';
+  modalCardNumber.textContent = item.cardNumber || '---';
+  modalCardLang.textContent = item.lang || '---';
+  modalCardCondition.textContent = item.condition || '---';
+  modalCardFinish.textContent = item.finish || 'Normal';
+  modalCardPrice.textContent = `R$ ${parseFloat(item.price || 0).toFixed(2)}`;
+  modalCardLocation.textContent = `Folha ${item.location?.sheet || '--'} (${item.location?.side || '---'} / Bolso ${item.location?.pocket || '-'})`;
 
-  // Garante que o modal abra sempre no modo visualização
-  viewMode.classList.remove('d-none');
-  editMode.classList.add('d-none');
-  shinyContainer.classList.add('d-none');
-  btnEditToggle.classList.remove('d-none');
-  btnSaveModal.classList.add('d-none');
+  // Preenche campos de edição com os dados atuais
+  modalEditSection.value = item.section || 'main';
+  modalEditLang.value = item.lang || 'PT-BR';
+  modalEditCondition.value = item.condition || 'NM';
+  modalEditFinish.value = item.finish || 'Normal';
+  modalEditPrice.value = item.price || 0;
+  modalEditShiny.checked = item.isShiny || false;
 
-  // Ação do Botão Alternar entre Ver e Editar
-  btnEditToggle.onclick = () => {
-    viewMode.classList.add('d-none');
-    editMode.classList.remove('d-none');
-    shinyContainer.classList.remove('d-none');
-    btnEditToggle.classList.add('d-none');
-    btnSaveModal.classList.remove('d-none');
-  };
-
-  // Ação do Botão Salvar Alterações
-  btnSaveModal.onclick = () => {
-    const updatedData = {
-      ...item,
-      section: editSection.value,
-      lang: editLang.value,
-      condition: editCondition.value,
-      finish: editFinish.value,
-      price: parseFloat(editPrice.value) || 0,
-      isShiny: editShiny.checked
-    };
-
-    // Recalcula a posição física caso tenha mudado de seção
-    const indexZeroBased = (parseInt(item.id, 10) || 1) - 1;
-    const sheetOffset = Math.floor(indexZeroBased / 18);
-    const actualSheet = SECTIONS[updatedData.section].startSheet + sheetOffset;
-    const positionInSheet = indexZeroBased % 18;
-    const isFront = positionInSheet < 9;
-    const sideText = isFront ? "Frente" : "Verso";
-    const pocketNumber = (positionInSheet % 9) + 1;
-
-    updatedData.location = { sheet: actualSheet, side: sideText, pocket: pocketNumber };
-
-    database.ref('pokedexCollection/' + key).update(updatedData, (error) => {
-      if (error) {
-        alert("Erro ao atualizar: " + error.message);
-      } else {
-        alert("Carta atualizada com sucesso! ❤️");
-        const modalEl = document.getElementById('cardModal');
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        modalInstance.hide();
-      }
-    });
-  };
-
-  // Ação do Botão Remover
-  btnRemoveModal.onclick = () => {
-    if (confirm(`Deseja remover ${item.name} do fichário?`)) {
-      database.ref('pokedexCollection/' + key).remove();
-      const modalEl = document.getElementById('cardModal');
-      const modalInstance = bootstrap.Modal.getInstance(modalEl);
-      modalInstance.hide();
+  modalBtnRemove.onclick = () => {
+    if (confirm(`Deseja realmente remover ${item.name} do fichário?`)) {
+      removePokemon(key);
+      cardModal.hide();
     }
   };
 
-  // Exibe o modal
-  const modal = new bootstrap.Modal(document.getElementById('cardModal'));
-  modal.show();
+  cardModal.show();
 }
+
+// Botão Alternar entre Visualizar e Editar dentro do Modal
+modalBtnEditToggle.addEventListener('click', () => {
+  isEditModeActive = !isEditModeActive;
+  if (isEditModeActive) {
+    modalViewMode.classList.add('d-none');
+    modalEditMode.classList.remove('d-none');
+    modalShinyCheckContainer.classList.remove('d-none');
+    modalBtnEditToggle.classList.add('d-none');
+    modalBtnSave.classList.remove('d-none');
+  } else {
+    modalViewMode.classList.remove('d-none');
+    modalEditMode.classList.add('d-none');
+    modalShinyCheckContainer.classList.add('d-none');
+    modalBtnEditToggle.classList.remove('d-none');
+    modalBtnSave.classList.add('d-none');
+  }
+});
+
+// Salvar alterações feitas no Modal
+modalBtnSave.addEventListener('click', () => {
+  if (!currentEditingKey) return;
+
+  const updatedData = {
+    section: modalEditSection.value,
+    lang: modalEditLang.value,
+    condition: modalEditCondition.value,
+    finish: modalEditFinish.value,
+    price: parseFloat(modalEditPrice.value) || 0,
+    isShiny: modalEditShiny.checked
+  };
+
+  // Atualiza no Firebase mantendo os dados anteriores intactos
+  collectionRef.child(currentEditingKey).update(updatedData, (error) => {
+    if (error) {
+      alert("Erro ao atualizar carta: " + error.message);
+    } else {
+      alert("Carta atualizada com sucesso! ✨");
+      cardModal.hide();
+    }
+  });
+});
+
+function removePokemon(key) {
+  collectionRef.child(key).remove().catch((error) => {
+    alert("Erro ao remover: " + error.message);
+  });
+}
+
+// 8. FILTROS E EVENTOS GERAIS
+filterSection.addEventListener('change', renderCollection);
+filterSheet.addEventListener('input', renderCollection);
+searchSaved.addEventListener('input', renderCollection);
+sortOrder.addEventListener('change', renderCollection);
+
+btnSearch.addEventListener('click', searchPokemon);
+pokemonInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') searchPokemon();
+});
+cardNumberInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') searchPokemon();
+});
+
+cardSetSelect.addEventListener('change', (e) => {
+  selectTcgCard(parseInt(e.target.value, 10));
+});
+
+// Alternar Tema (Dark / Light)
+btnTheme.addEventListener('click', () => {
+  const htmlTag = document.documentElement;
+  const currentTheme = htmlTag.getAttribute('data-bs-theme');
+  if (currentTheme === 'dark') {
+    htmlTag.setAttribute('data-bs-theme', 'light');
+    btnTheme.innerHTML = '<i class="fa-solid fa-sun"></i>';
+  } else {
+    htmlTag.setAttribute('data-bs-theme', 'dark');
+    btnTheme.innerHTML = '<i class="fa-solid fa-moon"></i>';
+  }
+});
+
+// Backup em JSON
+btnBackup.addEventListener('click', () => {
+  if (!currentRawData) return alert("Fichário vazio!");
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentRawData, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", "pokedex_backup.json");
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+});
