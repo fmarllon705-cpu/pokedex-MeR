@@ -49,11 +49,12 @@ const sortOrder = document.getElementById('sort-order');
 let currentPokemon = null;
 let currentRawData = null;
 let rawPokemonSprites = {};
+let foundCardsList = []; // Guarda as cartas encontradas no TCG
 
-// 1. BUSCA INTELIGENTE: POKÉAPI (DADOS) + POKÉMON TCG API (PREÇO E ARTE TCG)
+// 1. BUSCA DE PRECISÃO NA POKÉMON TCG API
 async function searchPokemon() {
   const queryName = pokemonInput.value.trim().toLowerCase();
-  const queryNumber = cardNumberInput.value.trim();
+  let queryNumber = cardNumberInput.value.trim();
 
   if (!queryName) return alert("Digite o nome do Pokémon!");
 
@@ -62,75 +63,49 @@ async function searchPokemon() {
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "block";
   collectorDetails.style.display = "none";
 
+  // Remove o total de cartas da barra se o usuário digitou (ex: "007/094" vira "7" ou "007")
+  const cleanNumber = queryNumber ? queryNumber.split('/')[0].replace(/^0+/, '') : '';
+
   try {
-    // 1. Busca dados básicos da Pokédex (ID, Número Nacional)
+    // 1. Busca dados do Pokémon na PokéAPI (para o ID da Pokédex Nacional)
     const pokeApiResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${queryName}`);
-    if (!pokeApiResponse.ok) throw new Error("Pokémon não encontrado");
-    const pokeData = await pokeApiResponse.json();
-
-    rawPokemonSprites = {
-      default: pokeData.sprites.front_default || pokeData.sprites.other['official-artwork'].front_default,
-      shiny: pokeData.sprites.front_shiny || pokeData.sprites.other['official-artwork'].front_shiny || pokeData.sprites.front_default
-    };
-
-    // 2. Busca Preço Automático na TCG API
-    let tcgCardPrice = 0;
-    let tcgCardImage = rawPokemonSprites.default;
-
-    try {
-      let tcgQuery = `name:"${queryName}"`;
-      if (queryNumber) {
-        // Limpa formatação tipo 025/165 para apenas 25
-        const cleanNumber = queryNumber.split('/')[0].replace(/^0+/, '');
-        tcgQuery += ` number:"${cleanNumber}"`;
-      }
-
-      const tcgResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(tcgQuery)}&pageSize=1`);
-      const tcgData = await tcgResponse.json();
-
-      if (tcgData.data && tcgData.data.length > 0) {
-        const card = tcgData.data[0];
-        tcgCardImage = card.images.small || tcgCardImage;
-
-        // Tenta pegar o preço do TCGPlayer (Market ou Mid)
-        if (card.tcgplayer && card.tcgplayer.prices) {
-          const prices = card.tcgplayer.prices;
-          const priceObj = prices.holofoil || prices.normal || prices.reverseHolofoil || prices.ungraded;
-          if (priceObj) {
-            const usdPrice = priceObj.market || priceObj.mid || priceObj.low || 0;
-            tcgCardPrice = (usdPrice * USD_TO_BRL).toFixed(2);
-          }
-        }
-      }
-    } catch (e) {
-      console.warn("Preço TCG automático indisponível, usando valor zero.", e);
+    let nationalId = 0;
+    if (pokeApiResponse.ok) {
+      const pokeData = await pokeApiResponse.json();
+      nationalId = pokeData.id;
+      rawPokemonSprites = {
+        default: pokeData.sprites.front_default || pokeData.sprites.other['official-artwork'].front_default,
+        shiny: pokeData.sprites.front_shiny || pokeData.sprites.other['official-artwork'].front_shiny || pokeData.sprites.front_default
+      };
     }
 
-    cardShiny.checked = false;
-    cardPrice.value = tcgCardPrice;
-    cardFinish.value = "Normal";
+    // 2. Monta a busca inteligente na Pokémon TCG API
+    let tcgQuery = `name:"${queryName}"`;
+    if (cleanNumber) {
+      tcgQuery += ` (number:"${cleanNumber}" OR number:"${queryNumber.split('/')[0]}")`;
+    }
 
-    currentPokemon = {
-      id: pokeData.id,
-      name: pokeData.name,
-      cardNumber: queryNumber || String(pokeData.id),
-      image: tcgCardImage,
-      section: sectionSelect.value,
-      addedAt: new Date().toISOString()
-    };
+    const tcgResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(tcgQuery)}&orderBy=-set.releaseDate`);
+    const tcgData = await tcgResponse.json();
 
-    pokeName.textContent = currentPokemon.name;
-    pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} (Carta Nº ${currentPokemon.cardNumber})`;
-    pokeImg.src = currentPokemon.image;
-    pokeImg.style.display = "inline-block";
-    if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
-    
-    collectorDetails.style.display = "flex";
-    btnSave.style.display = "block";
+    foundCardsList = tcgData.data || [];
 
-    calculatePhysicalPosition(currentPokemon.id);
+    if (foundCardsList.length === 0) {
+      // Caso não ache na TCG API, tenta buscar só por nome
+      const fallbackResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${queryName}"&pageSize=10`);
+      const fallbackData = await fallbackResponse.json();
+      foundCardsList = fallbackData.data || [];
+    }
+
+    if (foundCardsList.length > 0) {
+      // Seleciona a primeira carta por padrão (mais recente)
+      selectTcgCard(0, nationalId, queryNumber);
+    } else {
+      throw new Error("Nenhuma carta encontrada.");
+    }
 
   } catch (error) {
+    console.error(error);
     pokeName.textContent = "Não encontrado ❌";
     pokeIdDisplay.textContent = "#---";
     btnSave.style.display = "none";
@@ -139,14 +114,60 @@ async function searchPokemon() {
   }
 }
 
+// 2. APLECA OS DADOS DA CARTA SELECIONADA
+function selectTcgCard(index, nationalId, typedNumber) {
+  const card = foundCardsList[index];
+  if (!card) return;
+
+  let calculatedPrice = 0;
+  if (card.tcgplayer && card.tcgplayer.prices) {
+    const prices = card.tcgplayer.prices;
+    const priceObj = prices.normal || prices.holofoil || prices.reverseHolofoil || prices.ungraded || prices.reverseHolo;
+    if (priceObj) {
+      const usdPrice = priceObj.market || priceObj.mid || priceObj.low || 0;
+      calculatedPrice = (usdPrice * USD_TO_BRL).toFixed(2);
+    }
+  }
+
+  const finalNumber = typedNumber || `${card.number}/${card.set.printedTotal || '???'}`;
+
+  currentPokemon = {
+    id: nationalId || 0,
+    name: card.name,
+    cardNumber: finalNumber,
+    image: card.images.large || card.images.small,
+    setName: card.set.name,
+    section: sectionSelect.value,
+    addedAt: new Date().toISOString()
+  };
+
+  pokeName.textContent = `${currentPokemon.name} (${card.set.name})`;
+  pokeIdDisplay.textContent = `#${String(currentPokemon.id).padStart(3, '0')} (Carta Nº ${currentPokemon.cardNumber})`;
+  pokeImg.src = currentPokemon.image;
+  pokeImg.style.display = "inline-block";
+  if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
+
+  cardShiny.checked = false;
+  cardPrice.value = calculatedPrice;
+  cardFinish.value = "Normal";
+
+  collectorDetails.style.display = "flex";
+  btnSave.style.display = "block";
+
+  calculatePhysicalPosition(currentPokemon.id || 1);
+}
+
 // Alternar sprite Shiny
 cardShiny.addEventListener('change', () => {
   if (!currentPokemon) return;
-  currentPokemon.image = cardShiny.checked ? rawPokemonSprites.shiny : currentPokemon.image;
-  pokeImg.src = currentPokemon.image;
+  if (rawPokemonSprites.shiny && cardShiny.checked) {
+    pokeImg.src = rawPokemonSprites.shiny;
+  } else {
+    pokeImg.src = currentPokemon.image;
+  }
 });
 
-// 2. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3
+// 3. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3
 function calculatePhysicalPosition(positionNumber) {
   const sectionKey = sectionSelect.value;
   const indexZeroBased = positionNumber - 1;
@@ -186,11 +207,11 @@ function resetLocationInfo() {
 sectionSelect.addEventListener('change', () => {
   if (currentPokemon) {
     currentPokemon.section = sectionSelect.value;
-    calculatePhysicalPosition(currentPokemon.id);
+    calculatePhysicalPosition(currentPokemon.id || 1);
   }
 });
 
-// 3. FIREBASE CONFIG
+// 4. FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBxmA2lJlQHUKQrg-8_qyDmMvf7zXImhgc",
   authDomain: "pokedex-mer.firebaseapp.com",
@@ -206,7 +227,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const collectionRef = database.ref('pokedexCollection');
 
-// 4. SALVAR CARTA
+// 5. SALVAR CARTA
 btnSave.addEventListener('click', () => {
   if (!currentPokemon) return;
 
@@ -221,12 +242,12 @@ btnSave.addEventListener('click', () => {
     if (error) {
       alert("Erro ao salvar online: " + error.message);
     } else {
-      alert(`${currentPokemon.name} (#${currentPokemon.cardNumber}) adicionado à Pokédex! ❤️`);
+      alert(`${currentPokemon.name} (${currentPokemon.setName}) adicionado com sucesso! ❤️`);
     }
   });
 });
 
-// 5. ESCUTAR MUDANÇAS & RENDERIZAR
+// 6. ESCUTAR MUDANÇAS & RENDERIZAR
 collectionRef.on('value', (snapshot) => {
   const data = snapshot.val();
   currentRawData = data;
@@ -316,7 +337,7 @@ function removePokemon(firebaseKey) {
   }
 }
 
-// 6. MODO NOTURNO E BACKUP
+// 7. MODO NOTURNO E BACKUP
 btnTheme.addEventListener('click', () => {
   const currentTheme = document.documentElement.getAttribute('data-bs-theme');
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
