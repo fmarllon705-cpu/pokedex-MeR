@@ -219,6 +219,40 @@
     </div>
   </div>
 
+  <!-- MODAL DE DETALHES DA CARTA (POP-UP) -->
+  <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content pokedex-device text-light">
+        <div class="modal-header border-bottom border-secondary">
+          <h5 class="modal-title fw-bold text-uppercase" id="modalCardTitle">Detalhes da Carta</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="modalCardImg" src="" alt="Carta" class="img-fluid rounded shadow mb-3" style="max-height: 280px;">
+          
+          <div class="screen-box p-3 text-start">
+            <p class="mb-1"><strong><i class="fa-solid fa-bookmark"></i> Coleção/Set:</strong> <span id="modalCardSet">-</span></p>
+            <p class="mb-1"><strong><i class="fa-solid fa-hashtag"></i> Número:</strong> <span id="modalCardNumber">-</span></p>
+            <p class="mb-1"><strong><i class="fa-solid fa-language"></i> Idioma:</strong> <span id="modalCardLang">-</span></p>
+            <p class="mb-1"><strong><i class="fa-solid fa-star"></i> Condição:</strong> <span id="modalCardCondition">-</span></p>
+            <p class="mb-1"><strong><i class="fa-solid fa-wand-magic-sparkles"></i> Acabamento:</strong> <span id="modalCardFinish">-</span></p>
+            <p class="mb-1"><strong><i class="fa-solid fa-tag"></i> Preço Estimado:</strong> <span id="modalCardPrice" class="text-success fw-bold">-</span></p>
+            <hr class="border-secondary">
+            <p class="mb-0 text-warning text-center fw-bold">
+              <i class="fa-solid fa-book-bookmark"></i> Localização no Fichário: <span id="modalCardLocation">-</span>
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer border-top border-secondary justify-content-between">
+          <button type="button" id="modalBtnRemove" class="btn btn-danger btn-sm fw-bold">
+            <i class="fa-solid fa-trash-can"></i> Remover do Fichário
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase Compatibility Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
