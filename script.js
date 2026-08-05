@@ -1,4 +1,5 @@
-// Configuração do Fichário de 100 Folhas
+// Configuração do Fichário (100 Folhas x 18 cartas por folha = 1.800 cartas no total)
+const TOTAL_SLOTS = 1800;
 const SECTIONS = {
   main: { startSheet: 1 },
   fullart: { startSheet: 61 },
@@ -11,6 +12,7 @@ const sectionSelect = document.getElementById('section-select');
 const pokemonInput = document.getElementById('pokemon-input');
 const btnSearch = document.getElementById('btn-search');
 const btnSave = document.getElementById('btn-save');
+const btnBackup = document.getElementById('btn-backup');
 
 const pokeImg = document.getElementById('poke-img');
 const pokePlaceholderIcon = document.getElementById('poke-placeholder-icon');
@@ -20,13 +22,14 @@ const pokeIdDisplay = document.getElementById('poke-id-display');
 const resSheet = document.getElementById('res-sheet');
 const resSide = document.getElementById('res-side');
 const resPocket = document.getElementById('res-pocket');
-const pockets = document.querySelectorAll('.pocket');
 
 const collectionGrid = document.getElementById('collection-grid');
 const collectionCount = document.getElementById('collection-count');
+const progressBar = document.getElementById('progress-bar');
+const progressPercent = document.getElementById('progress-percent');
 
 let currentPokemon = null;
-let myCollection = JSON.parse(localStorage.getItem('myPokedexCollection')) || [];
+let currentRawData = null; // Guardar dados do backup
 
 // 1. BUSCAR POKÉMON NA POKÉAPI
 async function searchPokemon() {
@@ -47,7 +50,8 @@ async function searchPokemon() {
       id: data.id,
       name: data.name,
       image: data.sprites.front_default || data.sprites.other['official-artwork'].front_default,
-      section: sectionSelect.value
+      section: sectionSelect.value,
+      addedAt: new Date().toISOString()
     };
 
     // Atualiza Visual
@@ -88,25 +92,15 @@ function calculatePhysicalPosition(positionNumber) {
   resPocket.textContent = pocketNumber;
 
   currentPokemon.location = { sheet: actualSheet, side: sideText, pocket: pocketNumber };
-
-  highlightPocket(pocketNumber);
-}
-
-function highlightPocket(targetPocket) {
-  pockets.forEach(pocket => {
-    const pocketId = parseInt(pocket.getAttribute('data-pocket'), 10);
-    pocket.classList.toggle('active', pocketId === targetPocket);
-  });
 }
 
 function resetLocationInfo() {
   resSheet.textContent = "-";
   resSide.textContent = "-";
   resPocket.textContent = "-";
-  highlightPocket(0);
 }
 
-// 1. CONFIGURAÇÃO DO FIREBASE (Cole as credenciais do seu console aqui)
+// 3. CONFIGURAÇÃO DO FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBxmA2lJlQHUKQrg-8_qyDmMvf7zXImhgc",
   authDomain: "pokedex-mer.firebaseapp.com",
@@ -118,16 +112,14 @@ const firebaseConfig = {
   measurementId: "G-RYJXX19H5X"
 };
 
-// Inicializa o Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const collectionRef = database.ref('pokedexCollection');
 
-// 2. SALVAR NO FIREBASE (Substitui o localStorage)
+// 4. SALVAR NO FIREBASE
 btnSave.addEventListener('click', () => {
   if (!currentPokemon) return;
 
-  // Envia diretamente para o banco em nuvem
   const newCardRef = collectionRef.push();
   newCardRef.set(currentPokemon, (error) => {
     if (error) {
@@ -138,38 +130,66 @@ btnSave.addEventListener('click', () => {
   });
 });
 
-// 3. ESCUTAR MUDANÇAS EM TEMPO REAL (Atualiza no celular das duas instantaneamente)
+// 5. ESCUTAR MUDANÇAS EM TEMPO REAL & ATUALIZAR PROGRESSO
 collectionRef.on('value', (snapshot) => {
   collectionGrid.innerHTML = "";
   const data = snapshot.val();
-  
+  currentRawData = data; // Armazena para backup
+
   if (!data) {
     collectionCount.textContent = "0";
+    updateProgressBar(0);
     return;
   }
 
-  const items = Object.entries(data); // Transforma o objeto do Firebase em lista
-  collectionCount.textContent = items.length;
+  const items = Object.entries(data);
+  const totalCount = items.length;
+  collectionCount.textContent = totalCount;
+  
+  updateProgressBar(totalCount);
 
   items.forEach(([key, item]) => {
     const card = document.createElement('div');
-    card.classList.add('virtual-card');
+    card.classList.add('p-2', 'border', 'rounded', 'bg-white', 'text-center', 'position-relative');
+    card.style.width = "105px";
     card.innerHTML = `
-      <button class="btn-remove" onclick="removePokemon('${key}')"><i class="bi bi-x"></i></button>
-      <img src="${item.image}" alt="${item.name}">
-      <span class="card-title text-capitalize">${item.name}</span>
-      <span class="badge bg-warning text-dark fs-8 w-100 mt-1">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
+      <button class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 p-0 me-1 mt-1" onclick="removePokemon('${key}')">
+        <i class="bi bi-x-circle-fill"></i>
+      </button>
+      <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: contain;">
+      <span class="d-block text-capitalize fw-bold text-truncate small mt-1">${item.name}</span>
+      <span class="badge bg-warning text-dark w-100" style="font-size: 0.65rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
     `;
     collectionGrid.appendChild(card);
   });
 });
 
-// 4. REMOVER CARD EM NUVEM
+// Atualiza a Barra de Progresso (%)
+function updateProgressBar(count) {
+  const percentage = ((count / TOTAL_SLOTS) * 100).toFixed(1);
+  progressBar.style.width = `${percentage}%`;
+  progressPercent.textContent = `${percentage}%`;
+}
+
+// 6. REMOVER CARD
 function removePokemon(firebaseKey) {
   if (confirm("Deseja remover esta carta da Pokédex compartilhada?")) {
     database.ref('pokedexCollection/' + firebaseKey).remove();
   }
 }
+
+// 7. BACKUP DOS DADOS EM JSON
+btnBackup.addEventListener('click', () => {
+  if (!currentRawData) return alert("Nenhum dado cadastrado para exportar!");
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentRawData, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `pokedex-backup-${new Date().toISOString().slice(0,10)}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+});
 
 // OUVINTES DE EVENTOS DA BUSCA
 btnSearch.addEventListener('click', searchPokemon);
