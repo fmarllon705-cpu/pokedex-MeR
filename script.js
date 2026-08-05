@@ -26,6 +26,7 @@ const resPocket = document.getElementById('res-pocket');
 const collectorDetails = document.getElementById('collector-details');
 const cardLang = document.getElementById('card-lang');
 const cardCondition = document.getElementById('card-condition');
+const cardFinish = document.getElementById('card-finish');
 const cardNumber = document.getElementById('card-number');
 const cardPrice = document.getElementById('card-price');
 const cardShiny = document.getElementById('card-shiny');
@@ -38,6 +39,8 @@ const totalValueDisplay = document.getElementById('total-value-display');
 
 const filterSection = document.getElementById('filter-section');
 const filterSheet = document.getElementById('filter-sheet');
+const searchSaved = document.getElementById('search-saved');
+const sortOrder = document.getElementById('sort-order');
 
 let currentPokemon = null;
 let currentRawData = null;
@@ -67,6 +70,7 @@ async function searchPokemon() {
     cardShiny.checked = false;
     cardNumber.value = "";
     cardPrice.value = "";
+    cardFinish.value = "Normal";
 
     currentPokemon = {
       id: data.id,
@@ -152,6 +156,7 @@ btnSave.addEventListener('click', () => {
 
   currentPokemon.lang = cardLang.value;
   currentPokemon.condition = cardCondition.value;
+  currentPokemon.finish = cardFinish.value;
   currentPokemon.cardNumber = cardNumber.value.trim();
   currentPokemon.price = parseFloat(cardPrice.value) || 0;
   currentPokemon.isShiny = cardShiny.checked;
@@ -192,11 +197,27 @@ function renderCollection() {
 
   const selectedSection = filterSection.value;
   const selectedSheet = parseInt(filterSheet.value, 10);
+  const searchQuery = searchSaved.value.trim().toLowerCase();
+  const currentSort = sortOrder.value;
 
-  const filteredItems = items.filter(([key, item]) => {
+  // Filtragem
+  let filteredItems = items.filter(([key, item]) => {
     const matchSection = selectedSection === 'all' || item.section === selectedSection;
     const matchSheet = isNaN(selectedSheet) || item.location?.sheet === selectedSheet;
-    return matchSection && matchSheet;
+    const matchName = !searchQuery || item.name.toLowerCase().includes(searchQuery);
+    return matchSection && matchSheet && matchName;
+  });
+
+  // Ordenação
+  filteredItems.sort(([keyA, itemA], [keyB, itemB]) => {
+    if (currentSort === 'price-desc') {
+      return (parseFloat(itemB.price) || 0) - (parseFloat(itemA.price) || 0);
+    } else if (currentSort === 'recent') {
+      return new Date(itemB.addedAt || 0) - new Date(itemA.addedAt || 0);
+    } else {
+      // Padrão: por folha e bolso
+      return (itemA.location?.sheet || 0) - (itemB.location?.sheet || 0);
+    }
   });
 
   filteredItems.forEach(([key, item]) => {
@@ -207,6 +228,13 @@ function renderCollection() {
     const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1 fs-8">✨</span>' : '';
     const langBadge = item.lang ? `<span class="badge bg-secondary me-1" style="font-size: 0.55rem;">${item.lang}</span>` : '';
     const condBadge = item.condition ? `<span class="badge bg-dark" style="font-size: 0.55rem;">${item.condition}</span>` : '';
+    
+    // Badge de acabamento (Holo, Ultra, etc.)
+    let finishBadge = '';
+    if (item.finish === 'Holo') finishBadge = '<span class="badge bg-info text-dark d-block my-1" style="font-size: 0.55rem;">Holo ✨</span>';
+    else if (item.finish === 'Reverse') finishBadge = '<span class="badge bg-primary d-block my-1" style="font-size: 0.55rem;">Reverse 🌟</span>';
+    else if (item.finish === 'Ultra') finishBadge = '<span class="badge bg-danger d-block my-1" style="font-size: 0.55rem;">Ultra 💎</span>';
+
     const numDisplay = item.cardNumber ? `<small class="d-block text-muted" style="font-size: 0.65rem;">№ ${item.cardNumber}</small>` : '';
     const priceDisplay = item.price ? `<span class="d-block text-success fw-bold" style="font-size: 0.7rem;">R$ ${parseFloat(item.price).toFixed(2)}</span>` : '';
 
@@ -218,6 +246,7 @@ function renderCollection() {
       <img src="${item.image}" alt="${item.name}" style="width: 55px; height: 55px; object-fit: contain;">
       <span class="d-block text-capitalize fw-bold text-truncate small mt-1">${item.name}</span>
       ${numDisplay}
+      ${finishBadge}
       <div class="my-1">${langBadge}${condBadge}</div>
       ${priceDisplay}
       <span class="badge bg-warning text-dark w-100 mt-1" style="font-size: 0.65rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
@@ -262,6 +291,8 @@ btnBackup.addEventListener('click', () => {
 // EVENTOS DE FILTRO E BUSCA
 filterSection.addEventListener('change', renderCollection);
 filterSheet.addEventListener('input', renderCollection);
+searchSaved.addEventListener('input', renderCollection);
+sortOrder.addEventListener('change', renderCollection);
 
 btnSearch.addEventListener('click', searchPokemon);
 pokemonInput.addEventListener('keypress', (e) => {
