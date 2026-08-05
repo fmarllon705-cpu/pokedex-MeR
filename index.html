@@ -217,32 +217,50 @@
     </div>
   </div>
 
-  <!-- MODAL DE DETALHES DA CARTA (POP-UP) -->
-  <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
+  <!-- MODAL / POP-UP DE DETALHES DA CARTA -->
+  <div class="modal fade" id="cardModal" tabindex="-1" aria-labelledby="cardModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content pokedex-device text-light">
-        <div class="modal-header border-bottom border-secondary">
-          <h5 class="modal-title fw-bold text-uppercase" id="modalCardTitle">Detalhes da Carta</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-content border-secondary shadow-lg">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title fw-bold" id="cardModalLabel">
+            <i class="fa-solid fa-bolt"></i> <span id="modalCardTitle">Detalhes da Carta</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
-        <div class="modal-body text-center">
-          <img id="modalCardImg" src="" alt="Carta" class="img-fluid rounded shadow mb-3" style="max-height: 280px;">
-          
-          <div class="screen-box p-3 text-start">
-            <p class="mb-1"><strong><i class="fa-solid fa-bookmark"></i> Coleção/Set:</strong> <span id="modalCardSet">-</span></p>
-            <p class="mb-1"><strong><i class="fa-solid fa-hashtag"></i> Número:</strong> <span id="modalCardNumber">-</span></p>
-            <p class="mb-1"><strong><i class="fa-solid fa-language"></i> Idioma:</strong> <span id="modalCardLang">-</span></p>
-            <p class="mb-1"><strong><i class="fa-solid fa-star"></i> Condição:</strong> <span id="modalCardCondition">-</span></p>
-            <p class="mb-1"><strong><i class="fa-solid fa-wand-magic-sparkles"></i> Acabamento:</strong> <span id="modalCardFinish">-</span></p>
-            <p class="mb-1"><strong><i class="fa-solid fa-tag"></i> Preço Estimado:</strong> <span id="modalCardPrice" class="text-success fw-bold">-</span></p>
-            <hr class="border-secondary">
-            <p class="mb-0 text-warning text-center fw-bold">
-              <i class="fa-solid fa-book-bookmark"></i> Localização no Fichário: <span id="modalCardLocation">-</span>
-            </p>
+        <div class="modal-body">
+          <div class="row align-items-center">
+            <div class="col-5 text-center">
+              <img id="modalCardImg" src="" alt="Carta" class="img-fluid rounded shadow-sm" style="max-height: 220px;">
+            </div>
+            <div class="col-7">
+              <ul class="list-group list-group-flush small">
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Coleção:</span> <span id="modalCardSet" class="text-truncate ms-2" style="max-width: 150px;">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Número:</span> <span id="modalCardNumber">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Idioma:</span> <span id="modalCardLang">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Condição:</span> <span id="modalCardCondition">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Acabamento:</span> <span id="modalCardFinish">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Preço:</span> <span id="modalCardPrice" class="text-success fw-bold">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Posição:</span> <span id="modalCardLocation" class="badge bg-warning text-dark">---</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div class="modal-footer border-top border-secondary justify-content-between">
-          <button type="button" id="modalBtnRemove" class="btn btn-danger btn-sm fw-bold">
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="modalBtnRemove" class="btn btn-outline-danger btn-sm">
             <i class="fa-solid fa-trash-can"></i> Remover do Fichário
           </button>
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
@@ -251,12 +269,12 @@
     </div>
   </div>
 
+  <!-- Firebase App (Compat) e SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <!-- Script Principal -->
+  <!-- Script Customizado -->
   <script src="script.js"></script>
 </body>
 </html>
