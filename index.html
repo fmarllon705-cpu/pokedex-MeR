@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pokédex</title>
+  <title>Pokédex do Casal ❤️</title>
 
   <!-- PWA Manifest & Tema -->
   <link rel="manifest" href="manifest.json">
@@ -24,7 +24,7 @@
 
   <nav class="navbar navbar-dark bg-danger mb-4 shadow-sm">
     <div class="container d-flex justify-content-between align-items-center">
-      <span class="navbar-brand mb-0 h1">Pokédex do Casal ❤️</span>
+      <span class="navbar-brand mb-0 h1 fw-bold">Pokédex do Casal ❤️</span>
       <div>
         <button id="btn-theme" class="btn btn-outline-light btn-sm me-2"><i class="bi bi-moon-stars"></i></button>
         <button id="btn-backup" class="btn btn-outline-light btn-sm"><i class="bi bi-download me-1"></i> Backup</button>
@@ -70,7 +70,7 @@
             <h5 class="card-title fw-bold mb-3"><i class="bi bi-plus-circle me-1 text-danger"></i> Adicionar Carta</h5>
             
             <div class="mb-3">
-              <label class="form-label">Seção do Fichário</label>
+              <label class="form-label small fw-bold mb-1">Seção do Fichário</label>
               <select id="section-select" class="form-select">
                 <option value="main">National Dex (Folha 1+)</option>
                 <option value="fullart">Full Art / Secretas (Folha 61+)</option>
@@ -88,7 +88,7 @@
             <div id="search-result" class="text-center p-3 border rounded bg-body-secondary">
               <i id="poke-placeholder-icon" class="bi bi-card-image fs-1 text-muted"></i>
               <img id="poke-img" src="" alt="" style="display: none; max-width: 110px;">
-              <h5 id="poke-name" class="mt-2 text-capitalize fw-bold">-</h5>
+              <h5 id="poke-name" class="mt-2 text-capitalize fw-bold mb-0">-</h5>
               <p id="poke-id-display" class="text-muted small mb-2">#---</p>
               
               <!-- DETALHES DE COLECIONADOR -->
@@ -110,7 +110,6 @@
                   </select>
                 </div>
 
-                <!-- ACABAMENTO/RARIDADE (NOVO) -->
                 <div class="col-12">
                   <label class="form-label small fw-bold mb-1">Acabamento / Estilo</label>
                   <select id="card-finish" class="form-select form-select-sm">
@@ -161,7 +160,7 @@
               </h5>
             </div>
 
-            <!-- BARRA DE FILTROS E BUSCA INTERNA (ATUALIZADA) -->
+            <!-- BARRA DE FILTROS E BUSCA INTERNA -->
             <div class="row g-2 mb-3">
               <div class="col-12">
                 <div class="input-group input-group-sm">
@@ -190,8 +189,8 @@
               </div>
             </div>
 
-            <!-- GRID DE CARTAS -->
-            <div id="collection-grid" class="d-flex flex-wrap gap-2"></div>
+            <!-- GRID DE CARTAS (LIMPADO SEM CLASSES DE FLEXBOX CONFLITANTES) -->
+            <div id="collection-grid"></div>
           </div>
         </div>
       </div>
