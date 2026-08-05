@@ -217,7 +217,7 @@
     </div>
   </div>
 
-  <!-- MODAL / POP-UP DE DETALHES DA CARTA -->
+  <!-- MODAL / POP-UP DE DETALHES E EDIÇÃO DA CARTA -->
   <div class="modal fade" id="cardModal" tabindex="-1" aria-labelledby="cardModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-secondary shadow-lg">
@@ -230,10 +230,16 @@
         <div class="modal-body">
           <div class="row align-items-center">
             <div class="col-5 text-center">
-              <img id="modalCardImg" src="" alt="Carta" class="img-fluid rounded shadow-sm" style="max-height: 220px;">
+              <img id="modalCardImg" src="" alt="Carta" class="img-fluid rounded shadow-sm mb-2" style="max-height: 200px;">
+              <div id="modalShinyCheckContainer" class="form-check form-switch mt-2 text-start d-none">
+                <input class="form-check-input" type="checkbox" id="modalEditShiny">
+                <label class="form-check-label small fw-bold" for="modalEditShiny">Shiny ✨</label>
+              </div>
             </div>
+            
             <div class="col-7">
-              <ul class="list-group list-group-flush small">
+              <!-- MODO VISUALIZAÇÃO -->
+              <ul id="modalViewMode" class="list-group list-group-flush small">
                 <li class="list-group-item bg-transparent d-flex justify-content-between">
                   <span class="fw-bold">Coleção:</span> <span id="modalCardSet" class="text-truncate ms-2" style="max-width: 150px;">---</span>
                 </li>
@@ -256,14 +262,65 @@
                   <span class="fw-bold">Posição:</span> <span id="modalCardLocation" class="badge bg-warning text-dark">---</span>
                 </li>
               </ul>
+
+              <!-- MODO EDIÇÃO (Oculto inicialmente) -->
+              <div id="modalEditMode" class="d-none">
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Seção</label>
+                  <select id="modalEditSection" class="form-select form-select-sm">
+                    <option value="main">National Dex</option>
+                    <option value="fullart">Full Arts / Secretas</option>
+                    <option value="valuable">Valiosas / Raras</option>
+                    <option value="cute">Fofos / Especiais</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Idioma</label>
+                  <select id="modalEditLang" class="form-select form-select-sm">
+                    <option value="PT-BR">🇧🇷 PT-BR</option>
+                    <option value="EN">🇺🇸 EN</option>
+                    <option value="JP">🇯🇵 JP</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Condição</label>
+                  <select id="modalEditCondition" class="form-select form-select-sm">
+                    <option value="NM">Near Mint</option>
+                    <option value="SP">Slightly Played</option>
+                    <option value="MP">Moderately Played</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Acabamento</label>
+                  <select id="modalEditFinish" class="form-select form-select-sm">
+                    <option value="Normal">Normal</option>
+                    <option value="Holo">Holo ✨</option>
+                    <option value="Reverse">Reverse Holo 🌟</option>
+                    <option value="Ultra">Ultra Rara 💎</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Preço (R$)</label>
+                  <input type="number" step="0.01" id="modalEditPrice" class="form-control form-control-sm">
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" id="modalBtnRemove" class="btn btn-outline-danger btn-sm">
-            <i class="fa-solid fa-trash-can"></i> Remover do Fichário
+            <i class="fa-solid fa-trash-can"></i> Remover
           </button>
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+          <div>
+            <button type="button" id="modalBtnEditToggle" class="btn btn-warning btn-sm fw-bold">
+              <i class="fa-solid fa-pen-to-square"></i> Editar
+            </button>
+            <button type="button" id="modalBtnSave" class="btn btn-success btn-sm fw-bold d-none">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+          </div>
         </div>
       </div>
     </div>
