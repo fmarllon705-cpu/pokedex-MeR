@@ -60,26 +60,81 @@
   box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
 }
 
-/* Tela de Preview Padrão */
+/* =========================================================
+   TELA DE PREVIEW DINÂMICA COM CONTRASTE AUTOMÁTICO DE TEXTO
+   ========================================================= */
 .pokedex-screen {
   background-color: #8fa373;
   border-radius: 10px;
   border: 3px solid #5a6b44;
   transition: background-color 0.4s ease, border-color 0.4s ease;
+  
+  /* Padrão (Fundo Claro) */
+  --text-main: #1a1a1a;
+  --text-muted: #3a3a3a;
+  --label-color: #1a1a1a;
 }
 
-/* Tonalidades dinâmicas baseadas no tipo elemental da carta */
-.pokedex-screen.type-grass { background-color: #2e5a36 !important; border-color: #4caf50; }
-.pokedex-screen.type-fire { background-color: #7a281c !important; border-color: #f44336; }
-.pokedex-screen.type-water { background-color: #1a4a6e !important; border-color: #2196f3; }
-.pokedex-screen.type-lightning { background-color: #7a6810 !important; border-color: #ffeb3b; }
-.pokedex-screen.type-psychic { background-color: #5a286e !important; border-color: #9c27b0; }
-.pokedex-screen.type-fighting { background-color: #7a4216 !important; border-color: #ff9800; }
-.pokedex-screen.type-darkness { background-color: #262626 !important; border-color: #424242; }
-.pokedex-screen.type-metal { background-color: #4a5568 !important; border-color: #90a4ae; }
-.pokedex-screen.type-fairy { background-color: #7a2e5d !important; border-color: #e91e63; }
-.pokedex-screen.type-dragon { background-color: #49337a !important; border-color: #673ab7; }
-.pokedex-screen.type-colorless { background-color: #525c65 !important; border-color: #9e9e9e; }
+/* Definição de cores e adaptação de texto claro para fundos escuros */
+.pokedex-screen.type-grass { 
+  background-color: #2e5a36 !important; border-color: #4caf50; 
+  --text-main: #ffffff; --text-muted: #d4d4d4; --label-color: #ffffff; 
+}
+.pokedex-screen.type-fire { 
+  background-color: #7a281c !important; border-color: #f44336; 
+  --text-main: #ffffff; --text-muted: #ffcccc; --label-color: #ffffff; 
+}
+.pokedex-screen.type-water { 
+  background-color: #1a4a6e !important; border-color: #2196f3; 
+  --text-main: #ffffff; --text-muted: #cce0ff; --label-color: #ffffff; 
+}
+.pokedex-screen.type-lightning { 
+  background-color: #61520b !important; border-color: #ffeb3b; 
+  --text-main: #ffffff; --text-muted: #fff5cc; --label-color: #ffffff; 
+}
+.pokedex-screen.type-psychic { 
+  background-color: #5a286e !important; border-color: #9c27b0; 
+  --text-main: #ffffff; --text-muted: #f0ccff; --label-color: #ffffff; 
+}
+.pokedex-screen.type-fighting { 
+  background-color: #7a4216 !important; border-color: #ff9800; 
+  --text-main: #ffffff; --text-muted: #ffe6cc; --label-color: #ffffff; 
+}
+.pokedex-screen.type-darkness { 
+  background-color: #262626 !important; border-color: #424242; 
+  --text-main: #ffffff; --text-muted: #cccccc; --label-color: #ffffff; 
+}
+.pokedex-screen.type-metal { 
+  background-color: #4a5568 !important; border-color: #90a4ae; 
+  --text-main: #ffffff; --text-muted: #e2e8f0; --label-color: #ffffff; 
+}
+.pokedex-screen.type-fairy { 
+  background-color: #7a2e5d !important; border-color: #e91e63; 
+  --text-main: #ffffff; --text-muted: #ffcce6; --label-color: #ffffff; 
+}
+.pokedex-screen.type-dragon { 
+  background-color: #49337a !important; border-color: #673ab7; 
+  --text-main: #ffffff; --text-muted: #e6ccff; --label-color: #ffffff; 
+}
+.pokedex-screen.type-colorless { 
+  background-color: #525c65 !important; border-color: #9e9e9e; 
+  --text-main: #ffffff; --text-muted: #e0e0e0; --label-color: #ffffff; 
+}
+
+/* Aplicando as variáveis dinâmicas nos elementos de texto dentro da tela */
+#search-result #poke-name {
+  color: var(--text-main) !important;
+}
+
+#search-result #poke-id-display {
+  color: var(--text-muted) !important;
+}
+
+#search-result label, 
+#search-result .form-label, 
+#search-result .form-check-label {
+  color: var(--label-color) !important;
+}
 
 /* Estilização do Simulador 3x3 */
 .binder-preview-container {
