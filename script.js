@@ -1,11 +1,18 @@
 const TOTAL_SLOTS = 1800;
 const USD_TO_BRL = 5.20; // Cotação média para conversão automática em R$
 
-const SECTIONS = {
-  main: { startSheet: 1 },
-  fullart: { startSheet: 61 },
-  valuable: { startSheet: 76 },
-  cute: { startSheet: 89 }
+// Mapeamento cronológico das Gerações/Regiões por número de Pokédex Nacional
+const REGIONS = {
+  kanto: { startId: 1, endId: 151, startSheet: 1 },
+  johto: { startId: 152, endId: 251, startSheet: 18 },
+  hoenn: { startId: 252, endId: 386, startSheet: 29 },
+  sinnoh: { startId: 387, endId: 493, startSheet: 41 },
+  unova: { startId: 494, endId: 649, startSheet: 53 },
+  kalos: { startId: 650, endId: 721, startSheet: 72 },
+  alola: { startId: 722, endId: 809, startSheet: 80 },
+  galar: { startId: 810, endId: 905, startSheet: 91 },
+  paldea: { startId: 906, endId: 1025, startSheet: 102 },
+  especiais: { startId: 1026, endId: 9999, startSheet: 115 }
 };
 
 // Elementos DOM
@@ -57,7 +64,18 @@ let foundCardsList = [];
 let currentNationalId = 0;
 let currentTypedNumber = '';
 
-// 1. BUSCA INTELIGENTE NA POKÉMON TCG API (ATUALIZADA PARA PROMOS MEP)
+// Descobre automaticamente qual região o Pokémon pertence baseado no ID nacional
+function detectRegionByNationalId(id) {
+  if (!id || id > 1025) return 'especiais';
+  for (const [key, range] of Object.entries(REGIONS)) {
+    if (id >= range.startId && id <= range.endId) {
+      return key;
+    }
+  }
+  return 'especiais';
+}
+
+// 1. BUSCA INTELIGENTE NA POKÉMON TCG API
 async function searchPokemon() {
   const queryName = pokemonInput.value.trim().toLowerCase();
   let queryNumber = cardNumberInput.value.trim();
@@ -84,12 +102,13 @@ async function searchPokemon() {
         default: pokeData.sprites.front_default || pokeData.sprites.other['official-artwork'].front_default,
         shiny: pokeData.sprites.front_shiny || pokeData.sprites.other['official-artwork'].front_shiny || pokeData.sprites.front_default
       };
+
+      // Atualiza automaticamente a região correta com base na geração do Pokémon
+      const autoRegion = detectRegionByNationalId(currentNationalId);
+      sectionSelect.value = autoRegion;
     }
 
-    // Estratégia de busca otimizada para abranger Promos (MEP / Black Star)
     let found = [];
-
-    // 1. Tenta buscar pelo nome exato + número se informado
     let tcgQuery = `name:"${queryName}"`;
     if (cleanNumber) {
       tcgQuery += ` (number:"${cleanNumber}" OR number:"0${cleanNumber}" OR number:"00${cleanNumber}")`;
@@ -99,7 +118,6 @@ async function searchPokemon() {
     let tcgData = await tcgResponse.json();
     found = tcgData.data || [];
 
-    // 2. Se não vier nada ou se for carta promo, busca por nome e filtra pelo número nas promos/conjuntos
     if (found.length === 0 && cleanNumber) {
       const promoQuery = `name:"${queryName}" number:"${cleanNumber}"`;
       const promoResp = await fetch(`https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(promoQuery)}`);
@@ -107,7 +125,6 @@ async function searchPokemon() {
       found = promoData.data || [];
     }
 
-    // 3. Fallback final: traz todas as versões do Pokémon para você escolher no menu dropdown
     if (found.length === 0) {
       const fallbackResponse = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${queryName}"&orderBy=-set.releaseDate&pageSize=50`);
       const fallbackData = await fallbackResponse.json();
@@ -121,7 +138,6 @@ async function searchPokemon() {
       foundCardsList.forEach((card, idx) => {
         const option = document.createElement('option');
         option.value = idx;
-        // Destaca se for carta de Promoção/Special Set
         const isPromo = card.set.id.toLowerCase().includes('mep') || card.set.series.toLowerCase().includes('promo');
         const promoTag = isPromo ? ' ⭐ [PROMO]' : '';
         option.textContent = `[${card.set.name}] Nº ${card.number}${promoTag}`;
@@ -132,7 +148,6 @@ async function searchPokemon() {
         setSelectorContainer.style.display = "block";
       }
 
-      // Se houver uma correspondência exata com o número 005 / 5, seleciona ela automaticamente
       const matchIndex = foundCardsList.findIndex(c => c.number === cleanNumber || c.number === `0${cleanNumber}` || c.number === `00${cleanNumber}`);
       selectTcgCard(matchIndex !== -1 ? matchIndex : 0);
 
@@ -203,15 +218,18 @@ cardShiny.addEventListener('change', () => {
   }
 });
 
-// 3. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3
-function calculatePhysicalPosition(positionNumber) {
-  const sectionKey = sectionSelect.value;
-  const indexZeroBased = positionNumber - 1;
+// 3. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3 BASEADO NA REGIÃO
+function calculatePhysicalPosition(nationalId) {
+  const regionKey = sectionSelect.value;
+  const regionConfig = REGIONS[regionKey] || REGIONS.kanto;
 
-  const sheetOffset = Math.floor(indexZeroBased / 18);
-  const actualSheet = SECTIONS[sectionKey].startSheet + sheetOffset;
+  // Offset relativo dentro da região baseada na Pokedex Nacional
+  const relativeIndex = Math.max(0, nationalId - regionConfig.startId);
 
-  const positionInSheet = indexZeroBased % 18;
+  const sheetOffset = Math.floor(relativeIndex / 18);
+  const actualSheet = regionConfig.startSheet + sheetOffset;
+
+  const positionInSheet = relativeIndex % 18;
   const isFront = positionInSheet < 9;
   const sideText = isFront ? "Frente" : "Verso";
 
@@ -333,9 +351,8 @@ function renderCollection() {
     card.classList.add('poke-card-item');
     card.style.cursor = 'pointer';
     
-    // Evento de clique para abrir o Pop-up/Modal de detalhes e edição
     card.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return; // Evita abrir se clicar direto no botão de excluir
+      if (e.target.closest('button')) return;
       openCardModal(key, item);
     });
 
@@ -411,7 +428,6 @@ function openCardModal(key, item) {
   currentEditingKey = key;
   isEditModeActive = false;
   
-  // Reseta visualização do modal para o modo padrão de leitura
   modalViewMode.classList.remove('d-none');
   modalEditMode.classList.add('d-none');
   modalShinyCheckContainer.classList.add('d-none');
@@ -419,7 +435,6 @@ function openCardModal(key, item) {
   modalBtnSave.classList.add('d-none');
   modalBtnEditToggle.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar';
 
-  // Preenche dados visuais
   modalCardTitle.textContent = item.name;
   modalCardImg.src = item.image;
   modalCardSet.textContent = item.setName || '---';
@@ -430,8 +445,7 @@ function openCardModal(key, item) {
   modalCardPrice.textContent = `R$ ${parseFloat(item.price || 0).toFixed(2)}`;
   modalCardLocation.textContent = `Folha ${item.location?.sheet || '--'} (${item.location?.side || '---'} / Bolso ${item.location?.pocket || '-'})`;
 
-  // Preenche campos de edição com os dados atuais
-  modalEditSection.value = item.section || 'main';
+  modalEditSection.value = item.section || 'kanto';
   modalEditLang.value = item.lang || 'PT-BR';
   modalEditCondition.value = item.condition || 'NM';
   modalEditFinish.value = item.finish || 'Normal';
@@ -448,7 +462,6 @@ function openCardModal(key, item) {
   cardModal.show();
 }
 
-// Botão Alternar entre Visualizar e Editar dentro do Modal
 modalBtnEditToggle.addEventListener('click', () => {
   isEditModeActive = !isEditModeActive;
   if (isEditModeActive) {
@@ -466,7 +479,6 @@ modalBtnEditToggle.addEventListener('click', () => {
   }
 });
 
-// Salvar alterações feitas no Modal
 modalBtnSave.addEventListener('click', () => {
   if (!currentEditingKey) return;
 
@@ -479,7 +491,6 @@ modalBtnSave.addEventListener('click', () => {
     isShiny: modalEditShiny.checked
   };
 
-  // Atualiza no Firebase mantendo os dados anteriores intactos
   collectionRef.child(currentEditingKey).update(updatedData, (error) => {
     if (error) {
       alert("Erro ao atualizar carta: " + error.message);
@@ -514,7 +525,6 @@ cardSetSelect.addEventListener('change', (e) => {
   selectTcgCard(parseInt(e.target.value, 10));
 });
 
-// Alternar Tema (Dark / Light)
 btnTheme.addEventListener('click', () => {
   const htmlTag = document.documentElement;
   const currentTheme = htmlTag.getAttribute('data-bs-theme');
@@ -527,7 +537,6 @@ btnTheme.addEventListener('click', () => {
   }
 });
 
-// Backup em JSON
 btnBackup.addEventListener('click', () => {
   if (!currentRawData) return alert("Fichário vazio!");
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentRawData, null, 2));
