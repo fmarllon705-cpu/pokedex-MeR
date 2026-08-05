@@ -191,7 +191,6 @@ function renderCollection() {
   collectionCount.textContent = items.length;
   updateProgressBar(items.length);
 
-  // Calcula valor total de toda a coleção
   const totalValue = items.reduce((acc, [_, item]) => acc + (parseFloat(item.price) || 0), 0);
   totalValueDisplay.textContent = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -215,20 +214,18 @@ function renderCollection() {
     } else if (currentSort === 'recent') {
       return new Date(itemB.addedAt || 0) - new Date(itemA.addedAt || 0);
     } else {
-      // Padrão: por folha e bolso
       return (itemA.location?.sheet || 0) - (itemB.location?.sheet || 0);
     }
   });
 
   filteredItems.forEach(([key, item]) => {
     const card = document.createElement('div');
-    card.classList.add('poke-card-item'); // Utiliza estilização fluida do style.css
+    card.classList.add('poke-card-item');
     
-    const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1" style="font-size: 0.6rem;">✨</span>' : '';
+    const shinyBadge = item.isShiny ? '<span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1" style="font-size: 0.55rem;">✨</span>' : '';
     const langBadge = item.lang ? `<span class="badge bg-secondary me-1" style="font-size: 0.55rem;">${item.lang}</span>` : '';
     const condBadge = item.condition ? `<span class="badge bg-dark" style="font-size: 0.55rem;">${item.condition}</span>` : '';
     
-    // Badge de acabamento (Holo, Ultra, etc.)
     let finishBadge = '';
     if (item.finish === 'Holo') finishBadge = '<span class="badge bg-info text-dark d-block my-1" style="font-size: 0.55rem;">Holo ✨</span>';
     else if (item.finish === 'Reverse') finishBadge = '<span class="badge bg-primary d-block my-1" style="font-size: 0.55rem;">Reverse 🌟</span>';
@@ -239,8 +236,8 @@ function renderCollection() {
 
     card.innerHTML = `
       ${shinyBadge}
-      <button class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 p-0 me-1 mt-1" onclick="removePokemon('${key}')">
-        <i class="bi bi-x-circle-fill"></i>
+      <button class="btn btn-sm text-danger position-absolute top-0 end-0 p-0 me-1 mt-1" onclick="removePokemon('${key}')" style="font-size: 0.8rem;">
+        <i class="fa-solid fa-circle-xmark"></i>
       </button>
       <img src="${item.image}" alt="${item.name}">
       <span class="d-block text-capitalize fw-bold text-truncate small mt-1">${item.name}</span>
@@ -248,7 +245,7 @@ function renderCollection() {
       ${finishBadge}
       <div class="my-1">${langBadge}${condBadge}</div>
       ${priceDisplay}
-      <span class="badge bg-warning text-dark w-100 mt-1" style="font-size: 0.65rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
+      <span class="badge bg-warning text-dark w-100 mt-1" style="font-size: 0.6rem;">F:${item.location.sheet} | ${item.location.side[0]} | B:${item.location.pocket}</span>
     `;
     collectionGrid.appendChild(card);
   });
@@ -266,12 +263,12 @@ function removePokemon(firebaseKey) {
   }
 }
 
-// 6. MODO NOTURNO (DARK MODE)
+// 6. MODO NOTURNO
 btnTheme.addEventListener('click', () => {
   const currentTheme = document.documentElement.getAttribute('data-bs-theme');
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-bs-theme', newTheme);
-  btnTheme.innerHTML = newTheme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+  btnTheme.innerHTML = newTheme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
 });
 
 // BACKUP
@@ -287,7 +284,7 @@ btnBackup.addEventListener('click', () => {
   downloadAnchor.remove();
 });
 
-// EVENTOS DE FILTRO E BUSCA
+// EVENTOS DE FILTRO
 filterSection.addEventListener('change', renderCollection);
 filterSheet.addEventListener('input', renderCollection);
 searchSaved.addEventListener('input', renderCollection);
