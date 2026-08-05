@@ -1,21 +1,21 @@
 const TOTAL_SLOTS = 1800;
 const USD_TO_BRL = 5.20; // Cotação média para conversão automática em R$
 
-// Mapeamento cronológico das Gerações/Regiões por número de Pokédex Nacional
+// Mapeamento cronológico ajustado para caber no limite de 100 folhas (1800 slots)
 const REGIONS = {
   kanto: { startId: 1, endId: 151, startSheet: 1 },
-  johto: { startId: 152, endId: 251, startSheet: 18 },
-  hoenn: { startId: 252, endId: 386, startSheet: 29 },
-  sinnoh: { startId: 387, endId: 493, startSheet: 41 },
-  unova: { startId: 494, endId: 649, startSheet: 53 },
-  kalos: { startId: 650, endId: 721, startSheet: 72 },
-  alola: { startId: 722, endId: 809, startSheet: 80 },
-  galar: { startId: 810, endId: 905, startSheet: 91 },
-  paldea: { startId: 906, endId: 1025, startSheet: 102 },
-  especiais: { startId: 1026, endId: 9999, startSheet: 115 }
+  johto: { startId: 152, endId: 251, startSheet: 10 },
+  hoenn: { startId: 252, endId: 386, startSheet: 16 },
+  sinnoh: { startId: 387, endId: 493, startSheet: 24 },
+  unova: { startId: 494, endId: 649, startSheet: 30 },
+  kalos: { startId: 650, endId: 721, startSheet: 40 },
+  alola: { startId: 722, endId: 809, startSheet: 44 },
+  galar: { startId: 810, endId: 905, startSheet: 49 },
+  paldea: { startId: 906, endId: 1025, startSheet: 55 },
+  especiais: { startId: 1026, endId: 9999, startSheet: 62 }
 };
 
-// Dicionário com nomes bonitos das regiões para exibição na interface
+// Dicionário com nomes das regiões para exibição
 const REGION_NAMES = {
   kanto: "Kanto",
   johto: "Johto",
@@ -117,7 +117,6 @@ async function searchPokemon() {
         shiny: pokeData.sprites.front_shiny || pokeData.sprites.other['official-artwork'].front_shiny || pokeData.sprites.front_default
       };
 
-      // Atualiza automaticamente a região correta com base na geração do Pokémon
       const autoRegion = detectRegionByNationalId(currentNationalId);
       sectionSelect.value = autoRegion;
     }
@@ -218,7 +217,6 @@ function selectTcgCard(index) {
   pokeImg.style.display = "inline-block";
   if (pokePlaceholderIcon) pokePlaceholderIcon.style.display = "none";
 
-  // MUDANÇA DINÂMICA DE COR DO FUNDO DA TELA BASEADA NO TIPO DA CARTA
   const searchResultScreen = document.getElementById('search-result');
   searchResultScreen.className = searchResultScreen.className.replace(/type-\w+/g, '').trim();
   
@@ -248,20 +246,16 @@ cardShiny.addEventListener('change', () => {
   }
 });
 
-// 3. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3 BASEADO NA REGIÃO
+// 3. CÁLCULO DA POSIÇÃO FÍSICA SEGURA (LIMITADA A 100 FOLHAS / 1800 SLOTS)
 function calculatePhysicalPosition(nationalId) {
-  const regionKey = sectionSelect.value;
-  const regionConfig = REGIONS[regionKey] || REGIONS.kanto;
+  const safeId = (!nationalId || nationalId > 1025) ? 1026 : nationalId;
+  const globalIndex = Math.max(0, safeId - 1);
 
-  const relativeIndex = Math.max(0, nationalId - regionConfig.startId);
-
-  const sheetOffset = Math.floor(relativeIndex / 18);
-  const actualSheet = regionConfig.startSheet + sheetOffset;
-
-  const positionInSheet = relativeIndex % 18;
+  // Cada folha possui 18 bolsos (9 na frente, 9 no verso)
+  const actualSheet = Math.min(100, Math.floor(globalIndex / 18) + 1);
+  const positionInSheet = globalIndex % 18;
   const isFront = positionInSheet < 9;
   const sideText = isFront ? "Frente" : "Verso";
-
   const pocketNumber = (positionInSheet % 9) + 1;
 
   resSheetBadge.textContent = `Folha ${actualSheet}`;
@@ -277,6 +271,7 @@ function calculatePhysicalPosition(nationalId) {
     }
   });
 
+  if (!currentPokemon.location) currentPokemon.location = {};
   currentPokemon.location = { sheet: actualSheet, side: sideText, pocket: pocketNumber };
 }
 
@@ -582,4 +577,34 @@ btnBackup.addEventListener('click', () => {
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
+});
+
+// Script rápido para recalcular e atualizar o Firebase com as posições certas baseadas no ID Nacional
+collectionRef.once('value', (snapshot) => {
+  const data = snapshot.val();
+  if (!data) return console.log("Nenhum dado encontrado.");
+
+  const updates = {};
+  
+  Object.entries(data).forEach(([key, item]) => {
+    const safeId = (!item.id || item.id > 1025) ? 1026 : item.id;
+    const globalIndex = Math.max(0, safeId - 1);
+
+    const actualSheet = Math.min(100, Math.floor(globalIndex / 18) + 1);
+    const positionInSheet = globalIndex % 18;
+    const isFront = positionInSheet < 9;
+    const sideText = isFront ? "Frente" : "Verso";
+    const pocketNumber = (positionInSheet % 9) + 1;
+
+    // Atualiza apenas a propriedade location de cada item
+    updates[`${key}/location`] = {
+      sheet: actualSheet,
+      side: sideText,
+      pocket: pocketNumber
+    };
+  });
+
+  collectionRef.update(updates)
+    .then(() => console.log("✨ Todas as localizações foram corrigidas com sucesso no Firebase!"))
+    .catch((err) => console.error("Erro ao atualizar:", err));
 });
