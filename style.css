@@ -1,242 +1,160 @@
-/* ==========================================
-   POKÉDEX RETRO-MODERNA - ALTO CONTRASTE
-   ========================================== */
-
-:root {
-  --pokedex-red: #dc0a2d;
-  --pokedex-dark-red: #8e0018;
-  --pokedex-border: #232323;
-  --screen-bg: #8b956d;
-}
-
-body.pokedex-body {
-  background: #2b2b2b;
-  background-image: radial-gradient(#3a3a3a 15%, transparent 16%);
-  background-size: 20px 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #fff;
+/* Estilos Base da Pokédex */
+.pokedex-body {
+  background: linear-gradient(135deg, #1f1f1f 0%, #111 100%);
   min-height: 100vh;
+  color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* CARCAÇA DA POKÉDEX */
 .pokedex-device {
-  background: linear-gradient(145deg, var(--pokedex-red), var(--pokedex-dark-red));
-  border: 4px solid var(--pokedex-border);
-  border-radius: 24px;
-  max-width: 1050px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  background-color: #a82020;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 5px 15px rgba(255,255,255,0.2);
+  border: 4px solid #751414;
 }
 
-.brand-title {
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 0px #000;
-}
-
-/* LUZES DO TOPO */
 .big-blue-lens {
-  width: 45px;
-  height: 45px;
-  background: radial-gradient(circle at 30% 30%, #00d2ff, #004080);
-  border: 3px solid #fff;
+  width: 35px;
+  height: 35px;
+  background: radial-gradient(circle at 30% 30%, #4da6ff, #004080);
   border-radius: 50%;
-  box-shadow: 0 0 10px #00d2ff;
+  border: 3px solid #fff;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
 }
 
 .mini-light {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  border: 2px solid #000;
+  border: 2px solid #fff;
 }
 
-/* CARDS INTERNOS */
-.pokedex-inner-card {
-  background: rgba(0, 0, 0, 0.35);
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-}
-
-/* TELAS ESTILO GAMEBOY */
 .screen-box {
-  background: #151515;
+  background-color: #2b2b2b;
+  border-radius: 12px;
   border: 2px solid #444;
-  border-radius: 10px;
 }
 
 .screen-label {
-  color: #ddd !important;
   font-size: 0.8rem;
   font-weight: bold;
+  color: #aaa;
+  text-transform: uppercase;
 }
 
-.pokedex-screen {
-  background: var(--screen-bg);
-  border: 3px solid #333;
-  border-radius: 10px;
-  color: #0f380f;
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+.pokedex-inner-card {
+  background-color: #363636;
+  border-radius: 12px;
+  border: 2px solid #4a4a4a;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
 }
 
-/* ==========================================
-   CORREÇÃO DE LEGIBILIDADE E PLACEHOLDERS (TEXTOS EM CINZA)
-   ========================================== */
-
-/* Força os campos de texto a ficarem bem legíveis */
 .pokedex-input {
-  background-color: #121212 !important;
-  color: #ffffff !important;
-  border: 1.5px solid #666 !important;
-  font-weight: 500;
+  background-color: #222 !important;
+  color: #fff !important;
+  border-color: #555 !important;
 }
 
 .pokedex-input:focus {
-  border-color: #ffde00 !important;
-  box-shadow: 0 0 8px rgba(255, 222, 0, 0.8);
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
 }
 
-/* CORRIGE O TEXTO DE EXEMPLO (PLACEHOLDER) PARA BRANCO/AMARELO CLARO */
-.pokedex-input::placeholder {
-  color: #d1d5db !important;
-  opacity: 1 !important; /* Garante que navegadores não escureçam */
-  font-style: italic;
+/* Tela de Preview Padrão */
+.pokedex-screen {
+  background-color: #8fa373;
+  border-radius: 10px;
+  border: 3px solid #5a6b44;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
 }
 
-/* Força legibilidade em selects/dropdowns */
-select.pokedex-input option {
-  background-color: #1e1e1e !important;
-  color: #ffffff !important;
-}
+/* Tonalidades dinâmicas baseadas no tipo elemental da carta */
+.pokedex-screen.type-grass { background-color: #2e5a36 !important; border-color: #4caf50; }
+.pokedex-screen.type-fire { background-color: #7a281c !important; border-color: #f44336; }
+.pokedex-screen.type-water { background-color: #1a4a6e !important; border-color: #2196f3; }
+.pokedex-screen.type-lightning { background-color: #7a6810 !important; border-color: #ffeb3b; }
+.pokedex-screen.type-psychic { background-color: #5a286e !important; border-color: #9c27b0; }
+.pokedex-screen.type-fighting { background-color: #7a4216 !important; border-color: #ff9800; }
+.pokedex-screen.type-darkness { background-color: #262626 !important; border-color: #424242; }
+.pokedex-screen.type-metal { background-color: #4a5568 !important; border-color: #90a4ae; }
+.pokedex-screen.type-fairy { background-color: #7a2e5d !important; border-color: #e91e63; }
+.pokedex-screen.type-dragon { background-color: #49337a !important; border-color: #673ab7; }
+.pokedex-screen.type-colorless { background-color: #525c65 !important; border-color: #9e9e9e; }
 
-/* ==========================================
-   SIMULADOR DA FOLHA DO FICHÁRIO 3x3
-   ========================================== */
-
+/* Estilização do Simulador 3x3 */
 .binder-preview-container {
-  background: #11161b;
-  border: 2px solid #495057;
-  color: #fff;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
 }
 
 .binder-header-info {
-  background: #000000;
-  border-radius: 8px;
-  border: 1px solid #555;
-}
-
-.sheet-badge-num {
-  color: #ffde00 !important;
-  font-size: 0.85rem;
-}
-
-.sheet-badge-side {
-  color: #00e5ff !important;
-  font-size: 0.85rem;
-}
-
-.sheet-badge-pocket {
-  color: #00ff87 !important;
-  font-size: 0.85rem;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #fff;
 }
 
 .binder-grid-3x3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  max-width: 220px;
-  margin: 0 auto;
+  gap: 4px;
 }
 
 .pocket-slot {
-  aspect-ratio: 2.5 / 3.5;
-  background: #212529;
-  border: 2px dashed #6c757d;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.65rem;
   font-weight: bold;
-  font-size: 0.95rem;
-  color: #f8f9fa !important; /* Números dos bolsos bem claros */
-  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px 0;
 }
 
-/* HIGHLIGHT DO BOLSO SELECIONADO */
 .pocket-slot.active {
-  background: #00ff87 !important;
-  color: #000000 !important;
-  border: 2px solid #ffffff !important;
-  box-shadow: 0 0 14px #00ff87, inset 0 0 6px #ffffff;
-  transform: scale(1.06);
-  font-size: 1.2rem;
+  background-color: #ffc107 !important;
+  color: #000 !important;
+  border-color: #ffca2c !important;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.8);
 }
 
-/* BOTÕES POKÉDEX */
+/* Grid do Fichário de Cartas Salvas */
+.pokedex-grid-scroll {
+  max-height: 550px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.poke-card-item {
+  background: #f1f1f1;
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.poke-card-item:hover {
+  transform: translateY(-3px);
+}
+
+.poke-card-item img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
 .btn-pokedex-tool {
-  background: #222;
+  background-color: #444;
   color: #fff;
   border: 1px solid #666;
 }
 
 .btn-pokedex-tool:hover {
-  background: #444;
+  background-color: #555;
   color: #fff;
-}
-
-.btn-pokedex-action {
-  box-shadow: 0 4px 0px #145a32;
-}
-
-.btn-pokedex-action:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0px #145a32;
-}
-
-/* GRID DAS CARTAS SALVAS */
-.pokedex-grid-scroll {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 10px;
-  max-height: 520px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.pokedex-grid-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.pokedex-grid-scroll::-webkit-scrollbar-thumb {
-  background: #ffde00;
-  border-radius: 4px;
-}
-
-.poke-card-item {
-  background: #fff;
-  color: #222;
-  border: 2px solid #111;
-  border-radius: 10px;
-  padding: 6px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.poke-card-item img {
-  width: 55px;
-  height: 55px;
-  object-fit: contain;
-  margin: 0 auto;
-}
-
-@media (max-width: 576px) {
-  .pokedex-device {
-    border-radius: 12px;
-  }
-  .pokedex-grid-scroll {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-  }
 }
