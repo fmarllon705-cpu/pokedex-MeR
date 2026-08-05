@@ -136,6 +136,11 @@
                   <label class="small fw-bold text-success"><i class="fa-solid fa-robot"></i> Preço (Auto R$)</label>
                   <input type="number" step="0.01" id="card-price" class="form-control form-control-sm border-success fw-bold text-dark bg-white" placeholder="Auto R$">
                 </div>
+                <!-- NOVO: Campo de Quantidade na Tela Principal -->
+                <div class="col-6">
+                  <label class="small fw-bold text-warning"><i class="fa-solid fa-layer-group"></i> Exemplares</label>
+                  <input type="number" id="card-quantity" class="form-control form-control-sm border-warning fw-bold text-dark bg-white" value="1" min="1">
+                </div>
                 <div class="col-12">
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="card-shiny">
@@ -270,6 +275,10 @@
                 <li class="list-group-item bg-transparent d-flex justify-content-between">
                   <span class="fw-bold">Preço:</span> <span id="modalCardPrice" class="text-success fw-bold">---</span>
                 </li>
+                <!-- NOVO: Exibição de exemplares no modo visualização -->
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Exemplares:</span> <span id="modalCardQuantity" class="badge bg-success">1x</span>
+                </li>
                 <li class="list-group-item bg-transparent d-flex justify-content-between">
                   <span class="fw-bold">Posição:</span> <span id="modalCardLocation" class="badge bg-warning text-dark">---</span>
                 </li>
@@ -320,6 +329,11 @@
                 <div class="mb-1">
                   <label class="small fw-bold text-muted mb-0">Preço (R$)</label>
                   <input type="number" step="0.01" id="modalEditPrice" class="form-control form-control-sm">
+                </div>
+                <!-- NOVO: Input de quantidade no modo edição do modal -->
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Exemplares</label>
+                  <input type="number" id="modalEditQuantity" class="form-control form-control-sm" min="1" value="1">
                 </div>
               </div>
 
