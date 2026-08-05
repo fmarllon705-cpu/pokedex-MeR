@@ -19,9 +19,11 @@ const pokePlaceholderIcon = document.getElementById('poke-placeholder-icon');
 const pokeName = document.getElementById('poke-name');
 const pokeIdDisplay = document.getElementById('poke-id-display');
 
-const resSheet = document.getElementById('res-sheet');
-const resSide = document.getElementById('res-side');
-const resPocket = document.getElementById('res-pocket');
+// Elementos da Folha 3x3
+const resSheetBadge = document.getElementById('res-sheet-badge');
+const resSideBadge = document.getElementById('res-side-badge');
+const resPocketBadge = document.getElementById('res-pocket-badge');
+const pocketSlots = document.querySelectorAll('.pocket-slot');
 
 const collectorDetails = document.getElementById('collector-details');
 const cardLang = document.getElementById('card-lang');
@@ -107,7 +109,7 @@ cardShiny.addEventListener('change', () => {
   pokeImg.src = currentPokemon.image;
 });
 
-// 2. CÁLCULO DA POSIÇÃO FÍSICA
+// 2. CÁLCULO DA POSIÇÃO FÍSICA E HIGHLIGHT DO SLOT 3x3
 function calculatePhysicalPosition(positionNumber) {
   const sectionKey = sectionSelect.value;
   const indexZeroBased = positionNumber - 1;
@@ -121,18 +123,38 @@ function calculatePhysicalPosition(positionNumber) {
 
   const pocketNumber = (positionInSheet % 9) + 1;
 
-  resSheet.textContent = actualSheet;
-  resSide.textContent = sideText;
-  resPocket.textContent = pocketNumber;
+  // Atualiza Badges Superiores
+  resSheetBadge.textContent = `Folha ${actualSheet}`;
+  resSideBadge.textContent = sideText;
+  resPocketBadge.textContent = `Bolso ${pocketNumber}`;
+
+  // Ilumina o Bolso exato no Grid 3x3
+  pocketSlots.forEach(slot => {
+    const slotNumber = parseInt(slot.getAttribute('data-pocket'), 10);
+    if (slotNumber === pocketNumber) {
+      slot.classList.add('active');
+    } else {
+      slot.classList.remove('active');
+    }
+  });
 
   currentPokemon.location = { sheet: actualSheet, side: sideText, pocket: pocketNumber };
 }
 
 function resetLocationInfo() {
-  resSheet.textContent = "-";
-  resSide.textContent = "-";
-  resPocket.textContent = "-";
+  resSheetBadge.textContent = "Folha --";
+  resSideBadge.textContent = "---";
+  resPocketBadge.textContent = "Bolso -";
+  pocketSlots.forEach(slot => slot.classList.remove('active'));
 }
+
+// Recalcula se o usuário alterar a seção no select
+sectionSelect.addEventListener('change', () => {
+  if (currentPokemon) {
+    currentPokemon.section = sectionSelect.value;
+    calculatePhysicalPosition(currentPokemon.id);
+  }
+});
 
 // 3. FIREBASE CONFIG
 const firebaseConfig = {
