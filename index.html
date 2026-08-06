@@ -1,40 +1,369 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-bs-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pokédex</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokédex M&R❤️</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Estilos Customizados -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="app-container">
-    <h1>Minha Pokédex</h1>
+<body class="pokedex-body">
 
-    <!-- Barra de Progresso Clicável -->
-    <div className="progress-card" id="progressBarCard" title="Clique para ver a coleção completa">
-      <div class="progress-info">
-        <span>Coleção</span>
-        <span id="progressText">0 / 151 (0%)</span>
+  <div class="container py-4">
+    <!-- ESTRUTURA DA POKÉDEX -->
+    <div class="pokedex-device p-3 p-md-4">
+      
+      <!-- TOPO DA POKÉDEX (LUZES E TÍTULO) -->
+      <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary">
+        <div class="d-flex align-items-center gap-2">
+          <div class="big-blue-lens"></div>
+          <div class="mini-light bg-danger"></div>
+          <div class="mini-light bg-warning"></div>
+          <div class="mini-light bg-success"></div>
+        </div>
+        <h3 class="brand-title m-0 fw-bold text-uppercase text-light fs-4 text-center">
+          Pokédex do Casal <i class="fa-solid fa-heart text-danger"></i>
+        </h3>
+        <button id="btn-theme" class="btn btn-sm btn-outline-light rounded-circle" title="Alternar Tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
       </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
+
+      <!-- PAINEL SUPERIOR: PROGRESSO E VALOR -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-7">
+          <div class="screen-box p-3 h-100 d-flex flex-column justify-content-center">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="screen-label"><i class="fa-solid fa-chart-line"></i> Progresso Coleção</span>
+              <span id="progress-percent" class="badge bg-danger fs-6">0.0%</span>
+            </div>
+            <div class="progress" style="height: 14px;">
+              <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="screen-box p-3 h-100 text-end d-flex flex-column justify-content-center">
+            <span class="screen-label text-start"><i class="fa-solid fa-sack-dollar"></i> Valor Estimado</span>
+            <h2 id="total-value-display" class="fw-bold text-warning mb-0 fs-3">R$ 0,00</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- CORPO PRINCIPAL: BUSCA (ESQUERDA) E FICHÁRIO (DIREITA) -->
+      <div class="row g-4">
+        
+        <!-- COLUNA DA ESQUERDA: CAPTURAR CARTA -->
+        <div class="col-lg-5">
+          <div class="pokedex-inner-card p-3">
+            <h5 class="fw-bold mb-3 text-warning"><i class="fa-solid fa-circle-plus"></i> Capturar Carta</h5>
+            
+            <div class="mb-2">
+              <label class="form-label small text-light fw-bold mb-1">Região do Fichário</label>
+              <select id="section-select" class="form-select pokedex-input">
+                <option value="kanto">1ª Geração - Kanto (#001-#151)</option>
+                <option value="johto">2ª Geração - Johto (#152-#251)</option>
+                <option value="hoenn">3ª Geração - Hoenn (#252-#386)</option>
+                <option value="sinnoh">4ª Geração - Sinnoh (#387-#493)</option>
+                <option value="unova">5ª Geração - Unova (#494-#649)</option>
+                <option value="kalos">6ª Geração - Kalos (#650-#721)</option>
+                <option value="alola">7ª Geração - Alola (#722-#809)</option>
+                <option value="galar">8ª Geração - Galar (#810-#905)</option>
+                <option value="paldea">9ª Geração - Paldea (#906-#1025)</option>
+                <option value="especiais">Cartas Especiais / Promos</option>
+              </select>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-7">
+                <input type="text" id="pokemon-input" class="form-control pokedex-input" placeholder="Nome (ex: Morgrem)">
+              </div>
+              <div class="col-5">
+                <input type="text" id="card-number-input" class="form-control pokedex-input" placeholder="Nº (ex: 95 ou 095)">
+              </div>
+            </div>
+
+            <button id="btn-search" class="btn btn-warning w-100 fw-bold mb-3 text-uppercase shadow-sm btn-pokedex-action">
+              <i class="fa-solid fa-magnifying-glass"></i> Buscar Carta e Preço
+            </button>
+
+            <!-- TELA PREVIEW DA CARTA E SELETOR DE EDIÇÕES -->
+            <div id="search-result" class="pokedex-screen text-center p-3 mb-2">
+              <i id="poke-placeholder-icon" class="fa-solid fa-gamepad fs-1 text-muted py-3"></i>
+              <img id="poke-img" src="" alt="" style="display: none; max-width: 130px;" class="rounded shadow mb-2">
+              <h5 id="poke-name" class="fw-bold text-uppercase mb-0">-</h5>
+              <p id="poke-id-display" class="small mb-2">#---</p>
+              
+              <!-- SELETOR DE EDIÇÃO/COLEÇÃO -->
+              <div id="set-selector-container" class="mb-2 text-start" style="display: none;">
+                <label class="small fw-bold"><i class="fa-solid fa-layer-group"></i> Selecionar Versão/Arte:</label>
+                <select id="card-set-select" class="form-select form-select-sm border-warning fw-bold text-dark bg-white"></select>
+              </div>
+
+              <!-- DETALHES COM O PREÇO AUTOMÁTICO -->
+              <div id="collector-details" class="row g-2 text-start mb-2" style="display: none;">
+                <div class="col-6">
+                  <label class="small fw-bold">Idioma</label>
+                  <select id="card-lang" class="form-select form-select-sm text-dark bg-white">
+                    <option value="PT-BR">🇧🇷 PT-BR</option>
+                    <option value="EN">🇺🇸 EN</option>
+                    <option value="JP">🇯🇵 JP</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label class="small fw-bold">Condição</label>
+                  <select id="card-condition" class="form-select form-select-sm text-dark bg-white">
+                    <option value="NM">Near Mint</option>
+                    <option value="SP">Slightly Played</option>
+                    <option value="MP">Moderately Played</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label class="small fw-bold">Acabamento</label>
+                  <select id="card-finish" class="form-select form-select-sm text-dark bg-white">
+                    <option value="Normal">Normal (Regular)</option>
+                    <option value="Holo">Holo ✨</option>
+                    <option value="Reverse">Reverse Holo 🌟</option>
+                    <option value="Ultra">Ultra Rara 💎</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label class="small fw-bold text-success"><i class="fa-solid fa-robot"></i> Preço (Auto R$)</label>
+                  <input type="number" step="0.01" id="card-price" class="form-control form-control-sm border-success fw-bold text-dark bg-white" placeholder="Auto R$">
+                </div>
+                <!-- NOVO: Campo de Quantidade na Tela Principal -->
+                <div class="col-6">
+                  <label class="small fw-bold text-warning"><i class="fa-solid fa-layer-group"></i> Exemplares</label>
+                  <input type="number" id="card-quantity" class="form-control form-control-sm border-warning fw-bold text-dark bg-white" value="1" min="1">
+                </div>
+                <div class="col-12">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="card-shiny">
+                    <label class="form-check-label small fw-bold" for="card-shiny">Versão Shiny ✨</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SIMULADOR 3x3 -->
+              <div id="binder-visualizer" class="binder-preview-container p-2 rounded mb-2">
+                <div class="binder-header-info d-flex justify-content-between align-items-center px-2 py-1 mb-2">
+                  <span class="sheet-badge-num fw-bold" id="res-sheet-badge">Folha --</span>
+                  <span class="sheet-badge-side fw-bold text-uppercase" id="res-side-badge">---</span>
+                  <span class="sheet-badge-pocket fw-bold" id="res-pocket-badge">Bolso -</span>
+                </div>
+                
+                <div class="binder-grid-3x3">
+                  <div class="pocket-slot" data-pocket="1">1</div>
+                  <div class="pocket-slot" data-pocket="2">2</div>
+                  <div class="pocket-slot" data-pocket="3">3</div>
+                  <div class="pocket-slot" data-pocket="4">4</div>
+                  <div class="pocket-slot" data-pocket="5">5</div>
+                  <div class="pocket-slot" data-pocket="6">6</div>
+                  <div class="pocket-slot" data-pocket="7">7</div>
+                  <div class="pocket-slot" data-pocket="8">8</div>
+                  <div class="pocket-slot" data-pocket="9">9</div>
+                </div>
+              </div>
+
+            </div>
+
+            <button id="btn-save" class="btn btn-success w-100 fw-bold text-uppercase btn-pokedex-action" style="display: none;">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar no Fichário
+            </button>
+
+          </div>
+        </div>
+
+        <!-- COLUNA DA DIREITA: CARTAS SALVAS / FICHÁRIO COMPARTILHADO -->
+        <div class="col-lg-7">
+          <div class="pokedex-inner-card p-3 h-100 d-flex flex-column">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold m-0 text-light"><i class="fa-solid fa-book-open"></i> Fichário (<span id="collection-count">0</span>)</h5>
+              <button id="btn-backup" class="btn btn-sm btn-pokedex-tool" title="Exportar Backup JSON">
+                <i class="fa-solid fa-download"></i> Backup
+              </button>
+            </div>
+
+            <!-- FILTROS DO FICHÁRIO -->
+            <div class="row g-2 mb-3">
+              <div class="col-md-4">
+                <select id="filter-section" class="form-select form-select-sm pokedex-input">
+                  <option value="all">Todas as Regiões</option>
+                  <option value="kanto">Kanto</option>
+                  <option value="johto">Johto</option>
+                  <option value="hoenn">Hoenn</option>
+                  <option value="sinnoh">Sinnoh</option>
+                  <option value="unova">Unova</option>
+                  <option value="kalos">Kalos</option>
+                  <option value="alola">Alola</option>
+                  <option value="galar">Galar</option>
+                  <option value="paldea">Paldea</option>
+                  <option value="especiais">Especiais / Promos</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <input type="number" id="filter-sheet" class="form-control form-control-sm pokedex-input" placeholder="Folha...">
+              </div>
+              <div class="col-md-5">
+                <input type="text" id="search-saved" class="form-control form-control-sm pokedex-input" placeholder="Buscar no fichário...">
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end mb-2">
+              <select id="sort-order" class="form-select form-select-sm pokedex-input w-auto">
+                <option value="sheet">Ordenar por Posição (Folha)</option>
+                <option value="price-desc">Ordenar por Maior Preço</option>
+                <option value="recent">Adicionados Recentemente</option>
+              </select>
+            </div>
+
+            <!-- GRADE DO FICHÁRIO -->
+            <div id="collection-grid" class="pokedex-grid-scroll"></div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL / POP-UP DE DETALHES E EDIÇÃO DA CARTA -->
+  <div class="modal fade" id="cardModal" tabindex="-1" aria-labelledby="cardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-secondary shadow-lg">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title fw-bold" id="cardModalLabel">
+            <i class="fa-solid fa-bolt"></i> <span id="modalCardTitle">Detalhes da Carta</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row align-items-center">
+            <div class="col-5 text-center">
+              <img id="modalCardImg" src="" alt="Carta" class="img-fluid rounded shadow-sm mb-2" style="max-height: 200px;">
+              <div id="modalShinyCheckContainer" class="form-check form-switch mt-2 text-start d-none">
+                <input class="form-check-input" type="checkbox" id="modalEditShiny">
+                <label class="form-check-label small fw-bold" for="modalEditShiny">Shiny ✨</label>
+              </div>
+            </div>
+            
+            <div class="col-7">
+              <!-- MODO VISUALIZAÇÃO -->
+              <ul id="modalViewMode" class="list-group list-group-flush small">
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Coleção:</span> <span id="modalCardSet" class="text-truncate ms-2" style="max-width: 150px;">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Número:</span> <span id="modalCardNumber">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Idioma:</span> <span id="modalCardLang">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Condição:</span> <span id="modalCardCondition">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Acabamento:</span> <span id="modalCardFinish">---</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Preço:</span> <span id="modalCardPrice" class="text-success fw-bold">---</span>
+                </li>
+                <!-- NOVO: Exibição de exemplares no modo visualização -->
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Exemplares:</span> <span id="modalCardQuantity" class="badge bg-success">1x</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="fw-bold">Posição:</span> <span id="modalCardLocation" class="badge bg-warning text-dark">---</span>
+                </li>
+              </ul>
+
+              <!-- MODO EDIÇÃO (Oculto inicialmente) -->
+              <div id="modalEditMode" class="d-none">
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Região</label>
+                  <select id="modalEditSection" class="form-select form-select-sm">
+                    <option value="kanto">Kanto</option>
+                    <option value="johto">Johto</option>
+                    <option value="hoenn">Hoenn</option>
+                    <option value="sinnoh">Sinnoh</option>
+                    <option value="unova">Unova</option>
+                    <option value="kalos">Kalos</option>
+                    <option value="alola">Alola</option>
+                    <option value="galar">Galar</option>
+                    <option value="paldea">Paldea</option>
+                    <option value="especiais">Especiais / Promos</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Idioma</label>
+                  <select id="modalEditLang" class="form-select form-select-sm">
+                    <option value="PT-BR">🇧🇷 PT-BR</option>
+                    <option value="EN">🇺🇸 EN</option>
+                    <option value="JP">🇯🇵 JP</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Condição</label>
+                  <select id="modalEditCondition" class="form-select form-select-sm">
+                    <option value="NM">Near Mint</option>
+                    <option value="SP">Slightly Played</option>
+                    <option value="MP">Moderately Played</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Acabamento</label>
+                  <select id="modalEditFinish" class="form-select form-select-sm">
+                    <option value="Normal">Normal</option>
+                    <option value="Holo">Holo ✨</option>
+                    <option value="Reverse">Reverse Holo 🌟</option>
+                    <option value="Ultra">Ultra Rara 💎</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Preço (R$)</label>
+                  <input type="number" step="0.01" id="modalEditPrice" class="form-control form-control-sm">
+                </div>
+                <!-- NOVO: Input de quantidade no modo edição do modal -->
+                <div class="mb-1">
+                  <label class="small fw-bold text-muted mb-0">Exemplares</label>
+                  <input type="number" id="modalEditQuantity" class="form-control form-control-sm" min="1" value="1">
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" id="modalBtnRemove" class="btn btn-outline-danger btn-sm">
+            <i class="fa-solid fa-trash-can"></i> Remover
+          </button>
+          <div>
+            <button type="button" id="modalBtnEditToggle" class="btn btn-warning btn-sm fw-bold">
+              <i class="fa-solid fa-pen-to-square"></i> Editar
+            </button>
+            <button type="button" id="modalBtnSave" class="btn btn-success btn-sm fw-bold d-none">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal da Pokédex Completa -->
-  <div class="modal-backdrop hidden" id="pokedexModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2>Pokédex Completa</h2>
-        <button class="close-btn" id="closeModalBtn">&times;</button>
-      </div>
-      <div class="pokemon-grid" id="pokemonGrid">
-        <!-- Pokémon serão gerados via JavaScript -->
-      </div>
-    </div>
-  </div>
-
+  <!-- Firebase App (Compat) e SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Script Customizado -->
   <script src="script.js"></script>
 </body>
 </html>
